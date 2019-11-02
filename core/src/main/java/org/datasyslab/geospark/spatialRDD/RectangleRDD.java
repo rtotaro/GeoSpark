@@ -21,9 +21,13 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
+import org.datasyslab.geospark.enums.GeometryType;
 import org.datasyslab.geospark.formatMapper.RectangleFormatMapper;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Polygon;
+
+import java.io.Serializable;
 
 // TODO: Auto-generated Javadoc
 
@@ -31,8 +35,8 @@ import org.locationtech.jts.geom.Polygon;
  * The Class RectangleRDD.
  */
 @Deprecated
-public class RectangleRDD
-        extends SpatialRDD<Polygon>
+public class RectangleRDD<P extends Serializable>
+        extends SpatialRDD<Polygon,P>
 {
     /**
      * Instantiates a new rectangle RDD.
@@ -45,7 +49,7 @@ public class RectangleRDD
      *
      * @param rawSpatialRDD the raw spatial RDD
      */
-    public RectangleRDD(JavaRDD<Polygon> rawSpatialRDD)
+    public RectangleRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD)
     {
         this.rawSpatialRDD = rawSpatialRDD;
     }
@@ -57,7 +61,7 @@ public class RectangleRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public RectangleRDD(JavaRDD<Polygon> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
+    public RectangleRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -151,7 +155,7 @@ public class RectangleRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public RectangleRDD(JavaRDD<Polygon> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
+    public RectangleRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.boundaryEnvelope = datasetBoundary;
@@ -167,7 +171,7 @@ public class RectangleRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public RectangleRDD(JavaRDD<Polygon> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
+    public RectangleRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -286,7 +290,7 @@ public class RectangleRDD
      * @param rawSpatialRDD the raw spatial RDD
      * @param newLevel the new level
      */
-    public RectangleRDD(JavaRDD<Polygon> rawSpatialRDD, StorageLevel newLevel)
+    public RectangleRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, StorageLevel newLevel)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.analyze(newLevel);
@@ -397,7 +401,7 @@ public class RectangleRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public RectangleRDD(JavaRDD<Polygon> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+    public RectangleRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);

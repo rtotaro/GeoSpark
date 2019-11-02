@@ -25,7 +25,7 @@ import org.datasyslab.geospark.spatialRDD.PolygonRDD
 
 object SpatialJoinShp extends App {
 
-  def loadShapefile(path: String, numPartitions: Int = 20): PolygonRDD = {
+  def loadShapefile(path: String, numPartitions: Int = 20): PolygonRDD[_] = {
     val shp = new ShapefileRDD(sc, path)
     val polygon = new PolygonRDD(shp.getPolygonRDD, StorageLevel.MEMORY_ONLY)
     //polygon.rawSpatialRDD = polygon.rawSpatialRDD.repartition(numPartitions)

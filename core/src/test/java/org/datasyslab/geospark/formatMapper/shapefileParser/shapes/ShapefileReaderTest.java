@@ -29,6 +29,7 @@ package org.datasyslab.geospark.formatMapper.shapefileParser.shapes;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -166,13 +167,13 @@ public class ShapefileReaderTest
         final Iterator<String> featureIterator = featureTexts.iterator();
 
         PolygonRDD spatialRDD = ShapefileReader.readToPolygonRDD(sc, inputLocation);
-        SpatialRDD<Geometry> geomeryRDD = ShapefileReader.readToGeometryRDD(sc, inputLocation);
+        SpatialRDD<Geometry,?> geomeryRDD = ShapefileReader.readToGeometryRDD(sc, inputLocation);
 
         long count = RangeQuery.SpatialRangeQuery(spatialRDD, new Envelope(-180, 180, -90, 90), false, false).count();
         assertEquals(spatialRDD.rawSpatialRDD.count(), count);
 
-        for (Geometry geometry : geomeryRDD.rawSpatialRDD.collect()) {
-            assertEquals(featureIterator.next(), geometry.toText());
+        for (GeometryBean geometry : geomeryRDD.rawSpatialRDD.collect()) {
+            assertEquals(featureIterator.next(), geometry.getGeometry().toText());
         }
     }
 
@@ -197,12 +198,12 @@ public class ShapefileReaderTest
         features.close();
         final Iterator<String> featureIterator = featureTexts.iterator();
         LineStringRDD spatialRDD = ShapefileReader.readToLineStringRDD(sc, inputLocation);
-        SpatialRDD<Geometry> geomeryRDD = ShapefileReader.readToGeometryRDD(sc, inputLocation);
+        SpatialRDD<Geometry,?> geomeryRDD = ShapefileReader.readToGeometryRDD(sc, inputLocation);
         long count = RangeQuery.SpatialRangeQuery(spatialRDD, new Envelope(-180, 180, -90, 90), false, false).count();
         assertEquals(spatialRDD.rawSpatialRDD.count(), count);
 
-        for (Geometry geometry : geomeryRDD.rawSpatialRDD.collect()) {
-            assertEquals(featureIterator.next(), geometry.toText());
+        for (GeometryBean geometry : geomeryRDD.rawSpatialRDD.collect()) {
+            assertEquals(featureIterator.next(), geometry.getGeometry().toText());
         }
     }
 
@@ -231,8 +232,8 @@ public class ShapefileReaderTest
         long count = RangeQuery.SpatialRangeQuery(spatialRDD, new Envelope(-180, 180, -90, 90), false, false).count();
         assertEquals(spatialRDD.rawSpatialRDD.count(), count);
 
-        for (Geometry geometry : spatialRDD.rawSpatialRDD.collect()) {
-            assertEquals(featureIterator.next(), geometry.toText());
+        for (GeometryBean geometry : (List<GeometryBean>)spatialRDD.rawSpatialRDD.collect()) {
+            assertEquals(featureIterator.next(), geometry.getGeometry().toText());
         }
     }
 
@@ -257,9 +258,9 @@ public class ShapefileReaderTest
         features.close();
         final Iterator<String> featureIterator = featureTexts.iterator();
         PointRDD spatialRDD = ShapefileReader.readToPointRDD(sc, inputLocation);
-        SpatialRDD<Geometry> geomeryRDD = ShapefileReader.readToGeometryRDD(sc, inputLocation);
-        for (Geometry geometry : geomeryRDD.rawSpatialRDD.collect()) {
-            assertEquals(featureIterator.next(), geometry.toText());
+        SpatialRDD<Geometry,?> geomeryRDD = ShapefileReader.readToGeometryRDD(sc, inputLocation);
+        for (GeometryBean geometry : geomeryRDD.rawSpatialRDD.collect()) {
+            assertEquals(featureIterator.next(), geometry.getGeometry().toText());
         }
     }
 
@@ -295,8 +296,8 @@ public class ShapefileReaderTest
         features.close();
         final Iterator<String> featureIterator = featureTexts.iterator();
 
-        for (Geometry geometry : ShapefileReader.readToGeometryRDD(sc, inputLocation).rawSpatialRDD.collect()) {
-            assertEquals(featureIterator.next(), geometry.getUserData());
+        for (GeometryBean geometry : ShapefileReader.readToGeometryRDD(sc, inputLocation).rawSpatialRDD.collect()) {
+            assertEquals(featureIterator.next(), geometry.getData());
         }
     }
 
@@ -380,7 +381,7 @@ public class ShapefileReaderTest
         while (hdfsFileIterator.hasNext()) {
             assertEquals(hdfsFileIterator.next().getPath().getParent().toString(), shapefileHDFSpath);
         }
-        SpatialRDD<Geometry> spatialRDD = ShapefileReader.readToGeometryRDD(sc, shapefileHDFSpath);
+        SpatialRDD<Geometry,?> spatialRDD = ShapefileReader.readToGeometryRDD(sc, shapefileHDFSpath);
         assertEquals("[STATEFP, COUNTYFP, COUNTYNS, AFFGEOID, GEOID, NAME, LSAD, ALAND, AWATER]", spatialRDD.fieldNames.toString());
     }
 }

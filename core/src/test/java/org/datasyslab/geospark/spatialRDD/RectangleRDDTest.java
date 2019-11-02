@@ -96,9 +96,9 @@ public class RectangleRDDTest
     {
         RectangleRDD spatialRDD = new RectangleRDD(sc, InputLocation, offset, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.HILBERT);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 
@@ -113,9 +113,9 @@ public class RectangleRDDTest
     {
         RectangleRDD spatialRDD = new RectangleRDD(sc, InputLocation, offset, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.RTREE);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 
@@ -130,9 +130,9 @@ public class RectangleRDDTest
     {
         RectangleRDD spatialRDD = new RectangleRDD(sc, InputLocation, offset, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.VORONOI);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+////            System.out.println("PointRDD spatial partitioning grids: "+ d.grid);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 

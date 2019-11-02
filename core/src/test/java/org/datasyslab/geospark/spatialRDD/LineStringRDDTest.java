@@ -97,9 +97,9 @@ public class LineStringRDDTest
     {
         LineStringRDD spatialRDD = new LineStringRDD(sc, InputLocation, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.HILBERT);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
     }
 
     /**
@@ -113,9 +113,9 @@ public class LineStringRDDTest
     {
         LineStringRDD spatialRDD = new LineStringRDD(sc, InputLocation, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.RTREE);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
     }
 
     /**
@@ -129,9 +129,9 @@ public class LineStringRDDTest
     {
         LineStringRDD spatialRDD = new LineStringRDD(sc, InputLocation, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.VORONOI);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
     }
 
     /**

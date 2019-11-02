@@ -29,6 +29,7 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.TypeU
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.*;
 import scala.Tuple2;
 
@@ -167,25 +168,25 @@ public class ShapefileRDD
      *
      * @return the polygon RDD
      */
-    public JavaRDD<Polygon> getPolygonRDD()
+    public JavaRDD<GeometryBean<Polygon,Serializable>> getPolygonRDD()
     {
-        return shapeRDD.flatMap(new FlatMapFunction<Geometry, Polygon>()
+        return shapeRDD.flatMap(new FlatMapFunction<Geometry, GeometryBean<Polygon,Serializable>>()
         {
             @Override
-            public Iterator<Polygon> call(Geometry spatialObject)
+            public Iterator<GeometryBean<Polygon,Serializable>> call(Geometry spatialObject)
                     throws Exception
             {
-                List<Polygon> result = new ArrayList<Polygon>();
+                List<GeometryBean<Polygon, Serializable>> result = new ArrayList<GeometryBean<Polygon, Serializable>>();
                 if (spatialObject instanceof MultiPolygon) {
                     MultiPolygon multiObjects = (MultiPolygon) spatialObject;
                     for (int i = 0; i < multiObjects.getNumGeometries(); i++) {
                         Polygon oneObject = (Polygon) multiObjects.getGeometryN(i);
                         oneObject.setUserData(multiObjects.getUserData());
-                        result.add(oneObject);
+                        result.add(GeometryBean.of(oneObject,(Serializable)multiObjects.getUserData()));
                     }
                 }
                 else if (spatialObject instanceof Polygon) {
-                    result.add((Polygon) spatialObject);
+                    result.add(GeometryBean.of(spatialObject,(Serializable)spatialObject.getUserData()));
                 }
                 else {
                     throw new Exception("[ShapefileRDD][getPolygonRDD] the object type is not Polygon or MultiPolygon type. It is " + spatialObject.getGeometryType());

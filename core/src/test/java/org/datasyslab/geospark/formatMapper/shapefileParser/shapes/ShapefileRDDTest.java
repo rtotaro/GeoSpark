@@ -29,6 +29,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -331,7 +332,7 @@ public class ShapefileRDDTest
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        assert ((Polygon) spatialRDD.rawSpatialRDD.take(1).get(0)).getUserData().equals("20\t175\t00485050\t0500000US20175\t20175\tSeward\t06\t1655865960\t2777350");
+        assert ((GeometryBean) spatialRDD.rawSpatialRDD.take(1).get(0)).getData().equals("20\t175\t00485050\t0500000US20175\t20175\tSeward\t06\t1655865960\t2777350");
         for (Geometry geometry : shapefileRDD.getShapeRDD().collect()) {
             Assert.assertEquals(featureIterator.next(), geometry.toText());
         }

@@ -19,18 +19,21 @@ package org.datasyslab.geospark.spatialRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.datasyslab.geospark.geometryObjects.Circle;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+
+import java.io.Serializable;
 
 // TODO: Auto-generated Javadoc
 
 /**
  * The Class CircleRDD.
  */
-public class CircleRDD
-        extends SpatialRDD<Circle>
+public class CircleRDD<P extends Serializable>
+        extends SpatialRDD<Circle,P>
 {
 
     /**
@@ -38,7 +41,7 @@ public class CircleRDD
      *
      * @param circleRDD the circle RDD
      */
-    public CircleRDD(JavaRDD<Circle> circleRDD)
+    public CircleRDD(JavaRDD<GeometryBean<Circle,P>> circleRDD)
     {
         this.rawSpatialRDD = circleRDD;
     }
@@ -50,7 +53,7 @@ public class CircleRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCRSCode the target epsg CRS code
      */
-    public CircleRDD(JavaRDD<Circle> circleRDD, String sourceEpsgCRSCode, String targetEpsgCRSCode)
+    public CircleRDD(JavaRDD<GeometryBean<Circle,P>> circleRDD, String sourceEpsgCRSCode, String targetEpsgCRSCode)
     {
         this.rawSpatialRDD = circleRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCRSCode);
@@ -86,12 +89,12 @@ public class CircleRDD
      */
     public PointRDD getCenterPointAsSpatialRDD()
     {
-        return new PointRDD(this.rawSpatialRDD.map(new Function<Circle, Point>()
+        return new PointRDD(this.rawSpatialRDD.map(new Function<GeometryBean<Circle,P>, GeometryBean<Point,P>>()
         {
 
-            public Point call(Circle circle)
+            public GeometryBean<Point,P> call(GeometryBean<Circle,P> circle)
             {
-                return (Point) circle.getCenterGeometry();
+                return GeometryBean.of((Point) circle.getGeometry().getCenterGeometry(),circle.getData());
             }
         }));
     }
@@ -103,13 +106,13 @@ public class CircleRDD
      */
     public PolygonRDD getCenterPolygonAsSpatialRDD()
     {
-        return new PolygonRDD(this.rawSpatialRDD.map(new Function<Circle, Polygon>()
+        return new PolygonRDD(this.rawSpatialRDD.map(new Function<GeometryBean<Circle,P>, GeometryBean<Polygon,P>>()
         {
 
-            public Polygon call(Circle circle)
+            public GeometryBean<Polygon,P> call(GeometryBean<Circle,P> circle)
             {
 
-                return (Polygon) circle.getCenterGeometry();
+                return GeometryBean.of((Polygon) circle.getGeometry().getCenterGeometry(),circle.getData());
             }
         }));
     }
@@ -121,13 +124,12 @@ public class CircleRDD
      */
     public LineStringRDD getCenterLineStringRDDAsSpatialRDD()
     {
-        return new LineStringRDD(this.rawSpatialRDD.map(new Function<Circle, LineString>()
+        return new LineStringRDD(this.rawSpatialRDD.map(new Function<GeometryBean<Circle,P>, GeometryBean<LineString,P>>()
         {
 
-            public LineString call(Circle circle)
+            public GeometryBean<LineString,P> call(GeometryBean<Circle,P> circle)
             {
-
-                return (LineString) circle.getCenterGeometry();
+                return GeometryBean.of((LineString) circle.getGeometry().getCenterGeometry(),circle.getData());
             }
         }));
     }
@@ -139,13 +141,12 @@ public class CircleRDD
      */
     public RectangleRDD getCenterRectangleRDDAsSpatialRDD()
     {
-        return new RectangleRDD(this.rawSpatialRDD.map(new Function<Circle, Polygon>()
+        return new RectangleRDD(this.rawSpatialRDD.map(new Function<GeometryBean<Circle,P>, GeometryBean<Polygon,P>>()
         {
 
-            public Polygon call(Circle circle)
+            public GeometryBean<Polygon,P> call(GeometryBean<Circle,P> circle)
             {
-
-                return (Polygon) circle.getCenterGeometry();
+                return GeometryBean.of((Polygon) circle.getGeometry().getCenterGeometry(),circle.getData());
             }
         }));
     }

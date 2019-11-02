@@ -17,12 +17,14 @@
 package org.datasyslab.geospark.spatialPartitioning;
 
 import org.datasyslab.geospark.enums.GridType;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import scala.Tuple2;
 
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.*;
 
 public class FlatGridPartitioner
@@ -39,10 +41,11 @@ public class FlatGridPartitioner
         super(null, grids);
     }
 
+
     @Override
-    public <T extends Geometry> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
-            throws Exception
-    {
+    public <T extends Geometry, P extends Serializable> Iterator<Tuple2<Integer, GeometryBean<T, P>>> placeObject(GeometryBean<T, P> bean) throws Exception {
+        T spatialObject = bean.getGeometry();
+
         Objects.requireNonNull(spatialObject, "spatialObject");
 
         // Some grid types (RTree and Voronoi) don't provide full coverage of the RDD extent and
@@ -51,21 +54,21 @@ public class FlatGridPartitioner
 
         final Envelope envelope = spatialObject.getEnvelopeInternal();
 
-        Set<Tuple2<Integer, T>> result = new HashSet();
+        Set<Tuple2<Integer, GeometryBean<T, P>>> result = new HashSet();
         boolean containFlag = false;
         for (int i = 0; i < grids.size(); i++) {
             final Envelope grid = grids.get(i);
             if (grid.covers(envelope)) {
-                result.add(new Tuple2(i, spatialObject));
+                result.add(new Tuple2(i, bean));
                 containFlag = true;
             }
             else if (grid.intersects(envelope) || envelope.covers(grid)) {
-                result.add(new Tuple2<>(i, spatialObject));
+                result.add(new Tuple2<>(i, bean));
             }
         }
 
         if (!containFlag) {
-            result.add(new Tuple2<>(overflowContainerID, spatialObject));
+            result.add(new Tuple2<>(overflowContainerID, bean));
         }
 
         return result.iterator();

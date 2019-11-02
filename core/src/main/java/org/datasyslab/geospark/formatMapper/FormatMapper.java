@@ -19,6 +19,7 @@ package org.datasyslab.geospark.formatMapper;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.GeometryType;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
@@ -35,8 +36,8 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.*;
 
-public class FormatMapper<T extends Geometry>
-        implements Serializable, FlatMapFunction<Iterator<String>, T>
+public class FormatMapper<T extends Geometry,P extends  Serializable>
+        implements Serializable, FlatMapFunction<Iterator<String>, GeometryBean<T,P>>
 {
 
     /**
@@ -279,12 +280,12 @@ public class FormatMapper<T extends Geometry>
         return coordinates;
     }
 
-    public <T extends Geometry> void addMultiGeometry(GeometryCollection multiGeometry, List<T> result)
+    public <T extends Geometry> void addMultiGeometry(GeometryCollection multiGeometry, List<GeometryBean<T,P>> result)
     {
         for (int i = 0; i < multiGeometry.getNumGeometries(); i++) {
             T geometry = (T) multiGeometry.getGeometryN(i);
             geometry.setUserData(multiGeometry.getUserData());
-            result.add(geometry);
+            result.add(GeometryBean.of(geometry));
         }
     }
 
@@ -369,10 +370,10 @@ public class FormatMapper<T extends Geometry>
     }
 
     @Override
-    public Iterator<T> call(Iterator<String> stringIterator)
+    public Iterator<GeometryBean<T,P>> call(Iterator<String> stringIterator)
             throws Exception
     {
-        List<T> result = new ArrayList<>();
+        List<GeometryBean<T,P>> result = new ArrayList<>();
         while (stringIterator.hasNext()) {
             String line = stringIterator.next();
             addGeometry(readGeometry(line), result);
@@ -380,7 +381,7 @@ public class FormatMapper<T extends Geometry>
         return result.iterator();
     }
 
-    private void addGeometry(Geometry geometry, List<T> result)
+    private void addGeometry(Geometry geometry, List<GeometryBean<T,P>> result)
     {
         if (geometry == null) {
             return;
@@ -395,7 +396,7 @@ public class FormatMapper<T extends Geometry>
             addMultiGeometry((MultiPolygon) geometry, result);
         }
         else {
-            result.add((T) geometry);
+            result.add(GeometryBean.of(geometry));
         }
     }
 }

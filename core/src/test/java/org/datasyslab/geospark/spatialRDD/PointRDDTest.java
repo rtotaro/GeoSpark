@@ -25,7 +25,9 @@
  */
 package org.datasyslab.geospark.spatialRDD;
 
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -68,10 +70,11 @@ public class PointRDDTest
         PointRDD spatialRDD = new PointRDD(sc, InputLocation, offset, splitter, true, numPartitions, StorageLevel.MEMORY_ONLY());
         assertEquals(inputCount, spatialRDD.approximateTotalCount);
         assertEquals(inputBoundary, spatialRDD.boundaryEnvelope);
-        assert spatialRDD.rawSpatialRDD.take(9).get(0).getUserData().equals("testattribute0\ttestattribute1\ttestattribute2");
-        assert spatialRDD.rawSpatialRDD.take(9).get(2).getUserData().equals("testattribute0\ttestattribute1\ttestattribute2");
-        assert spatialRDD.rawSpatialRDD.take(9).get(4).getUserData().equals("testattribute0\ttestattribute1\ttestattribute2");
-        assert spatialRDD.rawSpatialRDD.take(9).get(8).getUserData().equals("testattribute0\ttestattribute1\ttestattribute2");
+        JavaRDD<GeometryBean> rawSpatialRDD = spatialRDD.rawSpatialRDD;
+        assert rawSpatialRDD.take(9).get(0).getData().equals("testattribute0\ttestattribute1\ttestattribute2");
+        assert rawSpatialRDD.take(9).get(2).getData().equals("testattribute0\ttestattribute1\ttestattribute2");
+        assert rawSpatialRDD.take(9).get(4).getData().equals("testattribute0\ttestattribute1\ttestattribute2");
+        assert rawSpatialRDD.take(9).get(8).getData().equals("testattribute0\ttestattribute1\ttestattribute2");
     }
 
 
@@ -99,9 +102,9 @@ public class PointRDDTest
     {
         PointRDD spatialRDD = new PointRDD(sc, InputLocation, offset, splitter, false, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.EQUALGRID);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 
@@ -116,9 +119,9 @@ public class PointRDDTest
     {
         PointRDD spatialRDD = new PointRDD(sc, InputLocation, offset, splitter, false, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.HILBERT);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 
@@ -133,9 +136,9 @@ public class PointRDDTest
     {
         PointRDD spatialRDD = new PointRDD(sc, InputLocation, offset, splitter, true, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.RTREE);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 
@@ -150,9 +153,9 @@ public class PointRDDTest
     {
         PointRDD spatialRDD = new PointRDD(sc, InputLocation, offset, splitter, false, 10, StorageLevel.MEMORY_ONLY());
         spatialRDD.spatialPartitioning(GridType.VORONOI);
-        for (Envelope d : spatialRDD.grids) {
-            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
-        }
+//        for (Envelope d : spatialRDD.grids) {
+//            //System.out.println("PointRDD spatial partitioning grids: "+d.grid);
+//        }
         assert spatialRDD.countWithoutDuplicates() == spatialRDD.countWithoutDuplicatesSPRDD();
     }
 

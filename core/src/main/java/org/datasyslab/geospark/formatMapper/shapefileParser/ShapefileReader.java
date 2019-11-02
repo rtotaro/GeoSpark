@@ -51,7 +51,7 @@ public class ShapefileReader
      * @param inputPath
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath)
+    public static SpatialRDD<Geometry,?> readToGeometryRDD(JavaSparkContext sc, String inputPath)
     {
         return readToGeometryRDD(sc, inputPath, new GeometryFactory());
     }
@@ -64,9 +64,9 @@ public class ShapefileReader
      * @param geometryFactory
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath, final GeometryFactory geometryFactory)
+    public static SpatialRDD<Geometry,?> readToGeometryRDD(JavaSparkContext sc, String inputPath, final GeometryFactory geometryFactory)
     {
-        SpatialRDD<Geometry> spatialRDD = new SpatialRDD();
+        SpatialRDD spatialRDD = new SpatialRDD();
         spatialRDD.rawSpatialRDD = readShapefile(sc, inputPath, geometryFactory);
         try {
             spatialRDD.fieldNames = readFieldNames(sc, inputPath);

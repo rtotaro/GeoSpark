@@ -18,6 +18,7 @@ package org.datasyslab.geospark.spatialPartitioning;
 
 import org.apache.spark.Partitioner;
 import org.datasyslab.geospark.enums.GridType;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -49,8 +50,8 @@ abstract public class SpatialPartitioner
      * For points, returns exactly one partition as long as grid type is non-overlapping.
      * For other geometry types or for overlapping grid types, may return multiple partitions.
      */
-    abstract public <T extends Geometry> Iterator<Tuple2<Integer, T>>
-    placeObject(T spatialObject)
+    abstract public <T extends Geometry,P extends  Serializable> Iterator<Tuple2<Integer, GeometryBean<T,P>>>
+    placeObject(GeometryBean<T,P> spatialObject)
             throws Exception;
 
     @Nullable

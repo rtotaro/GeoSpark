@@ -17,13 +17,16 @@
 package org.datasyslab.geospark.rangeJudgement;
 
 import org.apache.spark.api.java.function.Function;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.Geometry;
+
+import java.io.Serializable;
 
 // TODO: Auto-generated Javadoc
 
-public class RangeFilter<U extends Geometry, T extends Geometry>
+public class RangeFilter<U extends Geometry, T extends Geometry,P extends Serializable>
         extends JudgementBase
-        implements Function<T, Boolean>
+        implements Function<GeometryBean<T,P>, Boolean>
 {
 
     public RangeFilter(U queryWindow, boolean considerBoundaryIntersection, boolean leftCoveredByRight)
@@ -34,11 +37,11 @@ public class RangeFilter<U extends Geometry, T extends Geometry>
     /* (non-Javadoc)
      * @see org.apache.spark.api.java.function.Function#call(java.lang.Object)
      */
-    public Boolean call(T geometry)
+    public Boolean call(GeometryBean<T,P> geometry)
             throws Exception
     {
         if (leftCoveredByRight) {
-            return match(geometry, queryGeometry);
+            return match(geometry.getGeometry(), queryGeometry);
         }
         else {
             return match(queryGeometry, queryGeometry);

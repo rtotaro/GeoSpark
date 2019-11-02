@@ -45,7 +45,7 @@ public class KNNQuery
      * @param useIndex the use index
      * @return the list
      */
-    public static <U extends Geometry, T extends Geometry> List<T> SpatialKnnQuery(SpatialRDD<T> spatialRDD, U originalQueryPoint, Integer k, boolean useIndex)
+    public static <U extends Geometry, T extends Geometry> List<T> SpatialKnnQuery(SpatialRDD<T,?> spatialRDD, U originalQueryPoint, Integer k, boolean useIndex)
     {
         U queryCenter = originalQueryPoint;
         if (spatialRDD.getCRStransformation()) {

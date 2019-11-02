@@ -28,8 +28,10 @@ package org.datasyslab.geospark.spatialOperator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -176,7 +178,9 @@ public class LineStringRangeTest
             long resultSize = RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false).count();
             assertEquals(resultSize, 999);
         }
-        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false).take(10).get(1).getUserData().toString() != null;
+        JavaRDD<GeometryBean> javaRDD = RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false);
+
+        assert javaRDD.take(10).get(1).getData().toString() != null;
     }
 
     /**
@@ -194,6 +198,8 @@ public class LineStringRangeTest
             long resultSize = RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, true).count();
             assertEquals(resultSize, 999);
         }
-        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, true).take(10).get(1).getUserData().toString() != null;
+        JavaRDD<GeometryBean> javaRDD = RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false);
+
+        assert javaRDD.take(10).get(1).getData().toString() != null;
     }
 }

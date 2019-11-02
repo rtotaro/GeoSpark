@@ -19,6 +19,7 @@ package org.datasyslab.geospark.joinJudgement;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.api.java.function.FlatMapFunction2;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
 
@@ -28,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RightIndexLookupJudgement<T extends Geometry, U extends Geometry>
+public class RightIndexLookupJudgement<T extends Geometry, U extends Geometry,P extends Serializable>
         extends JudgementBase
-        implements FlatMapFunction2<Iterator<T>, Iterator<SpatialIndex>, Pair<T, U>>, Serializable
+        implements FlatMapFunction2<Iterator<GeometryBean<T,P>>, Iterator<SpatialIndex>, Pair<T, U>>, Serializable
 {
 
     /**
@@ -42,7 +43,7 @@ public class RightIndexLookupJudgement<T extends Geometry, U extends Geometry>
     }
 
     @Override
-    public Iterator<Pair<T, U>> call(Iterator<T> streamShapes, Iterator<SpatialIndex> indexIterator)
+    public Iterator<Pair<T, U>> call(Iterator<GeometryBean<T,P>> streamShapes, Iterator<SpatialIndex> indexIterator)
             throws Exception
     {
         List<Pair<T, U>> result = new ArrayList<>();
@@ -55,7 +56,7 @@ public class RightIndexLookupJudgement<T extends Geometry, U extends Geometry>
 
         SpatialIndex treeIndex = indexIterator.next();
         while (streamShapes.hasNext()) {
-            T streamShape = streamShapes.next();
+            T streamShape = streamShapes.next().getGeometry();
             List<Geometry> candidates = treeIndex.query(streamShape.getEnvelopeInternal());
             for (Geometry candidate : candidates) {
                 // Refine phase. Use the real polygon (instead of its MBR) to recheck the spatial relation.

@@ -26,6 +26,7 @@
 package org.datasyslab.geospark.spatialOperator;
 
 import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,6 +39,7 @@ import org.datasyslab.geospark.spatialRDD.*;
 import org.locationtech.jts.geom.*;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -48,55 +50,57 @@ public class JoinQueryCorrectnessChecker
         extends GeoSparkTestBase
 {
 
+
+
     /**
      * The test polygon window set.
      */
-    public static List<Polygon> testPolygonWindowSet;
+    public static List<GeometryBean<Polygon,String>> testPolygonWindowSet;
 
     /**
      * The test inside polygon set.
      */
-    public static List<Polygon> testInsidePolygonSet;
+    public static List<GeometryBean<Polygon,String>> testInsidePolygonSet;
 
     /**
      * The test overlapped polygon set.
      */
-    public static List<Polygon> testOverlappedPolygonSet;
+    public static List<GeometryBean<Polygon,String>> testOverlappedPolygonSet;
 
     /**
      * The test outside polygon set.
      */
-    public static List<Polygon> testOutsidePolygonSet;
+    public static List<GeometryBean<Polygon,String>> testOutsidePolygonSet;
 
     /**
      * The test inside line string set.
      */
-    public static List<LineString> testInsideLineStringSet;
+    public static List<GeometryBean<LineString,String>> testInsideLineStringSet;
 
     /**
      * The test overlapped line string set.
      */
-    public static List<LineString> testOverlappedLineStringSet;
+    public static List<GeometryBean<LineString,String>> testOverlappedLineStringSet;
 
     /**
      * The test outside line string set.
      */
-    public static List<LineString> testOutsideLineStringSet;
+    public static List<GeometryBean<LineString,String>> testOutsideLineStringSet;
 
     /**
      * The test inside point set.
      */
-    public static List<Point> testInsidePointSet;
+    public static List<GeometryBean<Point,String>> testInsidePointSet;
 
     /**
      * The test on boundary point set.
      */
-    public static List<Point> testOnBoundaryPointSet;
+    public static List<GeometryBean<Point,String>> testOnBoundaryPointSet;
 
     /**
      * The test outside point set.
      */
-    public static List<Point> testOutsidePointSet;
+    public static List<GeometryBean<Point,String>> testOutsidePointSet;
 
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -149,16 +153,19 @@ public class JoinQueryCorrectnessChecker
                 String id = baseX + ":" + baseY;
                 String a = "a:" + id;
                 String b = "b:" + id;
+                String c = "c:" + id;
 
                 testPolygonWindowSet.add(wrap(makeSquare(baseX, baseY, 5), a));
                 testPolygonWindowSet.add(wrap(makeSquare(baseX, baseY, 5), b));
+//                testPolygonWindowSet.add(wrap(makeSquare(baseX, baseY, 5), c));
+
 
                 // Polygons
                 testInsidePolygonSet.add(wrap(makeSquare(baseX + 2, baseY + 2, 2), a));
                 testInsidePolygonSet.add(wrap(makeSquare(baseX + 2, baseY + 2, 2), b));
 
-                testOverlappedPolygonSet.add(wrap(makeSquare(baseX + 3, baseY + 3, 3), a));
-                testOverlappedPolygonSet.add(wrap(makeSquare(baseX + 3, baseY + 3, 3), b));
+                testOverlappedPolygonSet.add(wrap(makeSquare(baseX + 3, baseY + 3, 3.0), a));
+                testOverlappedPolygonSet.add(wrap(makeSquare(baseX + 3, baseY + 3, 3.0), b));
 
                 testOutsidePolygonSet.add(wrap(makeSquare(baseX + 6, baseY + 6, 3), a));
                 testOutsidePolygonSet.add(wrap(makeSquare(baseX + 6, baseY + 6, 3), b));
@@ -222,14 +229,14 @@ public class JoinQueryCorrectnessChecker
         return geometryFactory.createPoint(new Coordinate(x, y));
     }
 
-    private static <T extends Geometry> T wrap(T geometry, Object userData)
+    private static <T extends Geometry,P extends Serializable> GeometryBean<T,P> wrap(T geometry, P userData)
     {
         geometry.setUserData(userData);
-        return geometry;
+        return new GeometryBean<T,P>(geometry,userData);
     }
 
-    private <T extends Geometry, U extends Geometry> void prepareRDDs(SpatialRDD<T> objectRDD,
-            SpatialRDD<U> windowRDD)
+    private <T extends Geometry, U extends Geometry> void prepareRDDs(SpatialRDD<T,?> objectRDD,
+            SpatialRDD<U,?> windowRDD)
             throws Exception
     {
         objectRDD.rawSpatialRDD.repartition(4);

@@ -23,6 +23,7 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.random.SamplingUtils;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.datasyslab.geospark.enums.GridType;
@@ -52,7 +53,7 @@ import java.util.*;
 /**
  * The Class SpatialRDD.
  */
-public class SpatialRDD<T extends Geometry>
+public class SpatialRDD<T extends Geometry,P extends Serializable>
         implements Serializable
 {
 
@@ -74,7 +75,7 @@ public class SpatialRDD<T extends Geometry>
     /**
      * The spatial partitioned RDD.
      */
-    public JavaRDD<T> spatialPartitionedRDD;
+    public JavaRDD<GeometryBean<T,P>> spatialPartitionedRDD;
 
     /**
      * The indexed RDD.
@@ -89,7 +90,7 @@ public class SpatialRDD<T extends Geometry>
     /**
      * The raw spatial RDD.
      */
-    public JavaRDD<T> rawSpatialRDD;
+    public JavaRDD<GeometryBean<T,P>> rawSpatialRDD;
 
     /**
      * The grids.
@@ -154,13 +155,15 @@ public class SpatialRDD<T extends Geometry>
             this.CRStransformation = true;
             this.sourceEpsgCode = sourceEpsgCRSCode;
             this.targetEpgsgCode = targetEpsgCRSCode;
-            this.rawSpatialRDD = this.rawSpatialRDD.map(new Function<T, T>()
+            this.rawSpatialRDD = this.rawSpatialRDD.map(new Function<GeometryBean<T,P>, GeometryBean<T,P>>()
             {
                 @Override
-                public T call(T originalObject)
+                public GeometryBean<T,P> call(GeometryBean<T,P> originalObject)
                         throws Exception
                 {
-                    return (T) JTS.transform(originalObject, transform);
+                    T transformedGeometry = (T) JTS.transform(originalObject.getGeometry(), transform);
+
+                    return GeometryBean.of(transformedGeometry,originalObject.getData());
                 }
             });
             return true;
@@ -211,13 +214,13 @@ public class SpatialRDD<T extends Geometry>
         // Here, we choose to get samples faster over getting exactly specified number of samples.
         final double fraction = SamplingUtils.computeFractionForSampleSize(sampleNumberOfRecords, approximateTotalCount, false);
         List<Envelope> samples = this.rawSpatialRDD.sample(false, fraction)
-                .map(new Function<T, Envelope>()
+                .map(new Function<GeometryBean<T,P>, Envelope>()
                 {
                     @Override
-                    public Envelope call(T geometry)
+                    public Envelope call(GeometryBean<T,P> bean)
                             throws Exception
                     {
-                        return geometry.getEnvelopeInternal();
+                        return bean.getGeometry().getEnvelopeInternal();
                     }
                 })
                 .collect();
@@ -312,26 +315,26 @@ public class SpatialRDD<T extends Geometry>
         return true;
     }
 
-    private JavaRDD<T> partition(final SpatialPartitioner partitioner)
+    private JavaRDD<GeometryBean<T,P>> partition(final SpatialPartitioner partitioner)
     {
         return this.rawSpatialRDD.flatMapToPair(
-                new PairFlatMapFunction<T, Integer, T>()
+                new PairFlatMapFunction<GeometryBean<T,P>, Integer, GeometryBean<T,P>>()
                 {
                     @Override
-                    public Iterator<Tuple2<Integer, T>> call(T spatialObject)
+                    public Iterator<Tuple2<Integer, GeometryBean<T,P>>> call(GeometryBean<T,P> spatialObject)
                             throws Exception
                     {
                         return partitioner.placeObject(spatialObject);
                     }
                 }
         ).partitionBy(partitioner)
-                .mapPartitions(new FlatMapFunction<Iterator<Tuple2<Integer, T>>, T>()
+                .mapPartitions(new FlatMapFunction<Iterator<Tuple2<Integer, GeometryBean<T,P>>>, GeometryBean<T,P>>()
                 {
                     @Override
-                    public Iterator<T> call(final Iterator<Tuple2<Integer, T>> tuple2Iterator)
+                    public Iterator<GeometryBean<T,P>> call(final Iterator<Tuple2<Integer, GeometryBean<T,P>>> tuple2Iterator)
                             throws Exception
                     {
-                        return new Iterator<T>()
+                        return new Iterator<GeometryBean<T,P>>()
                         {
                             @Override
                             public boolean hasNext()
@@ -340,7 +343,7 @@ public class SpatialRDD<T extends Geometry>
                             }
 
                             @Override
-                            public T next()
+                            public GeometryBean<T,P> next()
                             {
                                 return tuple2Iterator.next()._2();
                             }
@@ -426,7 +429,7 @@ public class SpatialRDD<T extends Geometry>
      *
      * @return the raw spatial RDD
      */
-    public JavaRDD<T> getRawSpatialRDD()
+    public JavaRDD<GeometryBean<T,P>> getRawSpatialRDD()
     {
         return rawSpatialRDD;
     }
@@ -436,7 +439,7 @@ public class SpatialRDD<T extends Geometry>
      *
      * @param rawSpatialRDD the new raw spatial RDD
      */
-    public void setRawSpatialRDD(JavaRDD<T> rawSpatialRDD)
+    public void setRawSpatialRDD(JavaRDD<GeometryBean<T,P>> rawSpatialRDD)
     {
         this.rawSpatialRDD = rawSpatialRDD;
     }
@@ -472,13 +475,13 @@ public class SpatialRDD<T extends Geometry>
                     }
                 };
 
-        final Function2 seqOp = new Function2<StatCalculator, Geometry, StatCalculator>()
+        final Function2 seqOp = new Function2<StatCalculator, GeometryBean, StatCalculator>()
         {
             @Override
-            public StatCalculator call(StatCalculator agg, Geometry object)
+            public StatCalculator call(StatCalculator agg, GeometryBean object)
                     throws Exception
             {
-                return StatCalculator.add(agg, object);
+                return StatCalculator.add(agg, object.getGeometry());
             }
         };
 
@@ -508,16 +511,18 @@ public class SpatialRDD<T extends Geometry>
      */
     public void saveAsGeoJSON(String outputLocation)
     {
-        this.rawSpatialRDD.mapPartitions(new FlatMapFunction<Iterator<T>, String>()
+        this.rawSpatialRDD.mapPartitions(new FlatMapFunction<Iterator<GeometryBean<T,P>>, String>()
         {
             @Override
-            public Iterator<String> call(Iterator<T> iterator)
+            public Iterator<String> call(Iterator<GeometryBean<T,P>> iterator)
                     throws Exception
             {
                 ArrayList<String> result = new ArrayList();
                 GeoJSONWriter writer = new GeoJSONWriter();
                 while (iterator.hasNext()) {
-                    Geometry spatialObject = (Geometry) iterator.next();
+                    GeometryBean geometryBean = iterator.next();
+                    Geometry spatialObject = geometryBean.getGeometry();
+                    spatialObject.setUserData(geometryBean.getData());
                     Feature jsonFeature;
                     if (spatialObject.getUserData() != null) {
                         Map<String, Object> userData = new HashMap<String, Object>();
@@ -543,15 +548,15 @@ public class SpatialRDD<T extends Geometry>
     @Deprecated
     public RectangleRDD MinimumBoundingRectangle()
     {
-        JavaRDD<Polygon> rectangleRDD = this.rawSpatialRDD.map(new Function<T, Polygon>()
+        JavaRDD<GeometryBean<Polygon,P>> rectangleRDD = this.rawSpatialRDD.map(new Function<GeometryBean<T,P>, GeometryBean<Polygon,P>>()
         {
-            public Polygon call(T spatialObject)
+            public GeometryBean<Polygon,P> call(GeometryBean<T,P> spatialObject)
             {
                 Double x1, x2, y1, y2;
                 LinearRing linear;
                 Coordinate[] coordinates = new Coordinate[5];
                 GeometryFactory fact = new GeometryFactory();
-                final Envelope envelope = spatialObject.getEnvelopeInternal();
+                final Envelope envelope = spatialObject.getGeometry().getEnvelopeInternal();
                 x1 = envelope.getMinX();
                 x2 = envelope.getMaxX();
                 y1 = envelope.getMinY();
@@ -563,10 +568,10 @@ public class SpatialRDD<T extends Geometry>
                 coordinates[4] = coordinates[0];
                 linear = fact.createLinearRing(coordinates);
                 Polygon polygonObject = new Polygon(linear, null, fact);
-                return polygonObject;
+                return GeometryBean.of(polygonObject,spatialObject.getData());
             }
         });
-        return new RectangleRDD(rectangleRDD);
+        return new RectangleRDD<P>(rectangleRDD);
     }
 
     /**

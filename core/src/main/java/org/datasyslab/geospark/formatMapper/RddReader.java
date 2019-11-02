@@ -20,11 +20,13 @@ import org.apache.spark.api.java.JavaRDD;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.locationtech.jts.geom.Geometry;
 
+import java.io.Serializable;
+
 class RddReader
 {
-    public static SpatialRDD<Geometry> createSpatialRDD(JavaRDD rawTextRDD, FormatMapper<Geometry> formatMapper)
+    public static <P extends Serializable> SpatialRDD<Geometry,P> createSpatialRDD(JavaRDD rawTextRDD, FormatMapper<Geometry,P> formatMapper)
     {
-        SpatialRDD spatialRDD = new SpatialRDD<Geometry>();
+        SpatialRDD spatialRDD = new SpatialRDD<Geometry,P>();
         spatialRDD.rawSpatialRDD = rawTextRDD.mapPartitions(formatMapper);
         spatialRDD.fieldNames = formatMapper.readPropertyNames(rawTextRDD.take(1).get(0).toString());
         return spatialRDD;

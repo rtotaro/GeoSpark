@@ -158,8 +158,8 @@ class JoinTestBase
         return new RectangleRDD(rdd.rawSpatialRDD, StorageLevel.MEMORY_ONLY());
     }
 
-    protected void partitionRdds(SpatialRDD<? extends Geometry> queryRDD,
-            SpatialRDD<? extends Geometry> spatialRDD)
+    protected void partitionRdds(SpatialRDD<? extends Geometry,?> queryRDD,
+            SpatialRDD<? extends Geometry,?> spatialRDD)
             throws Exception
     {
         spatialRDD.spatialPartitioning(gridType);

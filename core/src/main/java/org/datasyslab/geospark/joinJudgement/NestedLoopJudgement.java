@@ -18,6 +18,7 @@ package org.datasyslab.geospark.joinJudgement;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.api.java.function.FlatMapFunction2;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.Geometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class NestedLoopJudgement<T extends Geometry, U extends Geometry>
+public class NestedLoopJudgement<T extends Geometry, U extends Geometry,P extends Serializable>
         extends JudgementBase
-        implements FlatMapFunction2<Iterator<T>, Iterator<U>, Pair<U, T>>, Serializable
+        implements FlatMapFunction2<Iterator<GeometryBean<T,P>>, Iterator<GeometryBean<U,P>>, Pair<U, T>>, Serializable
 {
     private static final Logger log = LoggerFactory.getLogger(NestedLoopJudgement.class);
 
@@ -43,7 +44,7 @@ public class NestedLoopJudgement<T extends Geometry, U extends Geometry>
     }
 
     @Override
-    public Iterator<Pair<U, T>> call(Iterator<T> iteratorObject, Iterator<U> iteratorWindow)
+    public Iterator<Pair<U, T>> call(Iterator<GeometryBean<T,P>> iteratorObject, Iterator<GeometryBean<U,P>> iteratorWindow)
             throws Exception
     {
         initPartition();
@@ -51,10 +52,10 @@ public class NestedLoopJudgement<T extends Geometry, U extends Geometry>
         List<Pair<U, T>> result = new ArrayList<>();
         List<T> queryObjects = new ArrayList<>();
         while (iteratorObject.hasNext()) {
-            queryObjects.add(iteratorObject.next());
+            queryObjects.add(iteratorObject.next().getGeometry());
         }
         while (iteratorWindow.hasNext()) {
-            U window = iteratorWindow.next();
+            U window = iteratorWindow.next().getGeometry();
             for (int i = 0; i < queryObjects.size(); i++) {
                 T object = queryObjects.get(i);
                 //log.warn("Check "+window.toText()+" with "+object.toText());

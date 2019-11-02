@@ -22,6 +22,8 @@ import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.locationtech.jts.geom.Geometry;
 
+import java.io.Serializable;
+
 public class WkbReader extends RddReader
 {
     /**
@@ -33,9 +35,9 @@ public class WkbReader extends RddReader
      * @param skipSyntacticallyInvalidGeometries whether allows GeoSpark to automatically skip syntax-invalid geometries, rather than throw errors
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath, int wkbColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
+    public static SpatialRDD<Geometry,?> readToGeometryRDD(JavaSparkContext sc, String inputPath, int wkbColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         JavaRDD rawTextRDD = sc.textFile(inputPath);
-        FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
+        FormatMapper<Geometry,?> formatMapper = new FormatMapper<Geometry, Serializable>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;
         return createSpatialRDD(rawTextRDD, formatMapper);
@@ -49,8 +51,8 @@ public class WkbReader extends RddReader
      * @param skipSyntacticallyInvalidGeometries whether allows GeoSpark to automatically skip syntax-invalid geometries, rather than throw errors
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaRDD rawTextRDD, int wkbColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
-        FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
+    public static SpatialRDD<Geometry,?> readToGeometryRDD(JavaRDD rawTextRDD, int wkbColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
+        FormatMapper<Geometry,?> formatMapper = new FormatMapper<Geometry, Serializable>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;
         return createSpatialRDD(rawTextRDD, formatMapper);

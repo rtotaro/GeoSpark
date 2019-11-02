@@ -125,7 +125,7 @@ public class PointJoinTest
         testNestedLoopInt(queryRDD, expectedPolygonMatchCount);
     }
 
-    private void testNestedLoopInt(SpatialRDD<Polygon> queryRDD, long expectedCount)
+    private void testNestedLoopInt(SpatialRDD<Polygon,?> queryRDD, long expectedCount)
             throws Exception
     {
         PointRDD spatialRDD = createPointRDD();
@@ -190,7 +190,7 @@ public class PointJoinTest
         testIndexInt(queryRDD, IndexType.QUADTREE, expectedPolygonMatchCount);
     }
 
-    private void testIndexInt(SpatialRDD<Polygon> queryRDD, IndexType indexType, long expectedCount)
+    private void testIndexInt(SpatialRDD<Polygon,?> queryRDD, IndexType indexType, long expectedCount)
             throws Exception
     {
         PointRDD spatialRDD = createPointRDD();
@@ -224,7 +224,7 @@ public class PointJoinTest
         testDynamicRTreeInt(polygonRDD, IndexType.RTREE, expectedCount);
     }
 
-    private void testDynamicRTreeInt(SpatialRDD<Polygon> queryRDD, IndexType indexType, long expectedCount)
+    private void testDynamicRTreeInt(SpatialRDD<Polygon,?> queryRDD, IndexType indexType, long expectedCount)
             throws Exception
     {
         PointRDD spatialRDD = createPointRDD();

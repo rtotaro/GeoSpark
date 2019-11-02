@@ -21,6 +21,7 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.function.FlatMapFunction2;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.enums.JoinBuildSide;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.datasyslab.geospark.monitoring.GeoSparkMetric;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -36,9 +37,9 @@ import java.util.*;
 
 import static org.datasyslab.geospark.utils.TimeUtils.elapsedSince;
 
-public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
+public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry,P extends Serializable>
         extends JudgementBase
-        implements FlatMapFunction2<Iterator<U>, Iterator<T>, Pair<U, T>>, Serializable
+        implements FlatMapFunction2<Iterator<GeometryBean<U,P>>, Iterator<GeometryBean<T,P>>, Pair<U, T>>, Serializable
 {
 
     private static final Logger log = LoggerFactory.getLogger(DynamicIndexLookupJudgement.class);
@@ -72,7 +73,7 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
     }
 
     @Override
-    public Iterator<Pair<U, T>> call(final Iterator<U> leftShapes, final Iterator<T> rightShapes)
+    public Iterator<Pair<U, T>> call(final Iterator<GeometryBean<U,P>> leftShapes, final Iterator<GeometryBean<T,P>> rightShapes)
             throws Exception
     {
 
@@ -88,8 +89,8 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
 
         final boolean buildLeft = (joinBuildSide == JoinBuildSide.LEFT);
 
-        final Iterator<? extends Geometry> buildShapes;
-        final Iterator<? extends Geometry> streamShapes;
+        final Iterator buildShapes;
+        final Iterator streamShapes;
         if (buildLeft) {
             buildShapes = leftShapes;
             streamShapes = rightShapes;
@@ -155,7 +156,7 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
                 while (streamShapes.hasNext()) {
                     shapeCnt++;
                     streamCount.add(1);
-                    final Geometry streamShape = streamShapes.next();
+                    final Geometry streamShape = ((GeometryBean)streamShapes.next()).getGeometry();
                     final List candidates = spatialIndex.query(streamShape.getEnvelopeInternal());
                     for (Object candidate : candidates) {
                         candidateCount.add(1);

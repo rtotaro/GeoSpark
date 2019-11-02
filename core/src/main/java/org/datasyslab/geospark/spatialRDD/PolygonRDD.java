@@ -24,9 +24,11 @@ import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.formatMapper.FormatMapper;
 import org.datasyslab.geospark.formatMapper.PolygonFormatMapper;
+import org.datasyslab.geospark.geometryObjects.GeometryBean;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.precision.GeometryPrecisionReducer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,8 +37,8 @@ import java.util.Arrays;
 /**
  * The Class PolygonRDD.
  */
-public class PolygonRDD
-        extends SpatialRDD<Polygon>
+public class PolygonRDD<P extends Serializable>
+        extends SpatialRDD<Polygon,P>
 {
     /**
      * Instantiates a new polygon RDD.
@@ -48,7 +50,7 @@ public class PolygonRDD
      *
      * @param rawSpatialRDD the raw spatial RDD
      */
-    public PolygonRDD(JavaRDD<Polygon> rawSpatialRDD)
+    public PolygonRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD)
     {
         this.rawSpatialRDD = rawSpatialRDD;
     }
@@ -60,7 +62,7 @@ public class PolygonRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public PolygonRDD(JavaRDD<Polygon> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
+    public PolygonRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -156,7 +158,7 @@ public class PolygonRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public PolygonRDD(JavaRDD<Polygon> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
+    public PolygonRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.boundaryEnvelope = datasetBoundary;
@@ -172,7 +174,7 @@ public class PolygonRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public PolygonRDD(JavaRDD<Polygon> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
+    public PolygonRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -285,7 +287,7 @@ public class PolygonRDD
      * @param rawSpatialRDD the raw spatial RDD
      * @param newLevel the new level
      */
-    public PolygonRDD(JavaRDD<Polygon> rawSpatialRDD, StorageLevel newLevel)
+    public PolygonRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, StorageLevel newLevel)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.analyze(newLevel);
@@ -394,7 +396,7 @@ public class PolygonRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public PolygonRDD(JavaRDD<Polygon> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+    public PolygonRDD(JavaRDD<GeometryBean<Polygon,P>> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -526,15 +528,15 @@ public class PolygonRDD
      */
     public Polygon PolygonUnion()
     {
-        Polygon result = this.rawSpatialRDD.reduce(new Function2<Polygon, Polygon, Polygon>()
+        GeometryBean<Polygon,P> result = this.rawSpatialRDD.reduce(new Function2<GeometryBean<Polygon,P>, GeometryBean<Polygon,P>, GeometryBean<Polygon,P>>()
         {
-            public Polygon call(Polygon v1, Polygon v2)
+            public GeometryBean<Polygon,P> call(GeometryBean<Polygon,P> v1, GeometryBean<Polygon,P> v2)
             {
                 //Reduce precision in JTS to avoid TopologyException
                 PrecisionModel pModel = new PrecisionModel();
                 GeometryPrecisionReducer pReducer = new GeometryPrecisionReducer(pModel);
-                Geometry p1 = pReducer.reduce(v1);
-                Geometry p2 = pReducer.reduce(v2);
+                Geometry p1 = pReducer.reduce(v1.getGeometry());
+                Geometry p2 = pReducer.reduce(v2.getGeometry());
                 //Union two polygons
                 Geometry polygonGeom = p1.union(p2);
                 Coordinate[] coordinates = polygonGeom.getCoordinates();
@@ -547,10 +549,10 @@ public class PolygonRDD
                 LinearRing linear = new GeometryFactory().createLinearRing(coordinatesClosed);
                 Polygon polygon = new Polygon(linear, null, fact);
                 //Return the two polygon union result
-                return polygon;
+                return GeometryBean.of(polygon);
             }
         });
-        return result;
+        return result.getGeometry();
     }
 }
 
