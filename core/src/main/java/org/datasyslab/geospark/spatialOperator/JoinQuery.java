@@ -501,7 +501,9 @@ public class JoinQuery
 
         final JavaRDD<Pair<U, T>> result =
                 (joinParams.allowDuplicates || uniqueResults) ? resultWithDuplicates
-                        : resultWithDuplicates.distinct();
+                        : resultWithDuplicates
+                        .map(p-> new Tuple2<Pair<U,T>,Pair>(p,Pair.of(p.getLeft().getUserData(),p.getRight().getUserData())))
+                        .distinct().map(t -> t._1);
 
         return result.mapToPair(new PairFunction<Pair<U, T>, U, T>()
         {
