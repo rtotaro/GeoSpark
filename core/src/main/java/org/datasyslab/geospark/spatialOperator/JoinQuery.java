@@ -36,8 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JoinQuery
 {
@@ -80,33 +80,41 @@ public class JoinQuery
 
     private static <U extends Geometry, T extends Geometry> JavaPairRDD<U, HashSet<T>> collectGeometriesByKey(JavaPairRDD<U, T> input)
     {
-        return input.aggregateByKey(
-                new HashSet<T>(),
-                new Function2<HashSet<T>, T, HashSet<T>>()
+        JavaPairRDD<Pair<U,?>, Pair<T,?>> inputKeyUnWrapped = input.mapToPair(t2 -> new Tuple2(Pair.of(t2._1, t2._1.getUserData()), Pair.of(t2._2, t2._2.getUserData())));
+
+        JavaPairRDD<Pair<U,?>,HashSet<Pair<T,?>>> aggregateByKey = inputKeyUnWrapped.aggregateByKey(
+                new HashSet<Pair<T,?>>(),
+                new Function2<HashSet<Pair<T,?>>, Pair<T,?>, HashSet<Pair<T,?>>>()
                 {
                     @Override
-                    public HashSet<T> call(HashSet<T> ts, T t)
-                            throws Exception
-                    {
+                    public HashSet<Pair<T,?>> call(HashSet<Pair<T,?>> ts, Pair<T,?> t)
+                            throws Exception {
                         ts.add(t);
                         return ts;
                     }
                 },
-                new Function2<HashSet<T>, HashSet<T>, HashSet<T>>()
+                new Function2<HashSet<Pair<T,?>>, HashSet<Pair<T,?>>, HashSet<Pair<T,?>>>()
                 {
                     @Override
-                    public HashSet<T> call(HashSet<T> ts, HashSet<T> ts2)
-                            throws Exception
-                    {
+                    public HashSet<Pair<T,?>> call(HashSet<Pair<T,?>> ts, HashSet<Pair<T,?>> ts2)
+                            throws Exception {
                         ts.addAll(ts2);
                         return ts;
                     }
                 });
+
+
+        return aggregateByKey.mapToPair(t2 -> {
+            Set<T> collect = t2._2.stream().map(it -> it.getKey()).collect(Collectors.toSet());
+            return new Tuple2(t2._1.getKey(),new HashSet<>(collect));
+        });
     }
 
     private static <U extends Geometry, T extends Geometry> JavaPairRDD<U, Long> countGeometriesByKey(JavaPairRDD<U, T> input)
     {
-        return input.aggregateByKey(
+        JavaPairRDD<Pair<U,?>, T> inputKeyUnWrapped = input.mapToPair(t2 -> new Tuple2(Pair.of(t2._1, t2._1.getUserData()), t2._2));
+
+        JavaPairRDD<Pair<U,?>,Long> aggregateByKey = inputKeyUnWrapped.aggregateByKey(
                 0L,
                 new Function2<Long, T, Long>()
                 {
@@ -128,6 +136,7 @@ public class JoinQuery
                         return count1 + count2;
                     }
                 });
+        return aggregateByKey.mapToPair(t2 -> new Tuple2(t2._1.getKey(),t2._2));
     }
 
     public static final class JoinParams
@@ -503,7 +512,8 @@ public class JoinQuery
                 (joinParams.allowDuplicates || uniqueResults) ? resultWithDuplicates
                         : resultWithDuplicates
                         .map(p-> new Tuple2<Pair<U,T>,Pair>(p,Pair.of(p.getLeft().getUserData(),p.getRight().getUserData())))
-                        .distinct().map(t -> t._1);
+                        .distinct()
+                        .map(t -> t._1);
 
         return result.mapToPair(new PairFunction<Pair<U, T>, U, T>()
         {
