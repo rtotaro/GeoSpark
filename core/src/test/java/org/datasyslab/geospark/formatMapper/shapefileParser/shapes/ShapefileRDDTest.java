@@ -25,21 +25,10 @@
  */
 package org.datasyslab.geospark.formatMapper.shapefileParser.shapes;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileRDD;
-import org.datasyslab.geospark.formatMapper.shapefileParser.boundary.BoundBox;
-import org.datasyslab.geospark.spatialOperator.RangeQuery;
-import org.datasyslab.geospark.spatialRDD.LineStringRDD;
-import org.datasyslab.geospark.spatialRDD.PointRDD;
-import org.datasyslab.geospark.spatialRDD.PolygonRDD;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -51,6 +40,13 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileRDD;
+import org.datasyslab.geospark.formatMapper.shapefileParser.boundary.BoundBox;
+import org.datasyslab.geospark.spatialOperator.RangeQuery;
+import org.datasyslab.geospark.spatialRDD.LineStringRDD;
+import org.datasyslab.geospark.spatialRDD.PointRDD;
+import org.datasyslab.geospark.spatialRDD.PolygonRDD;
+import org.locationtech.jts.geom.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;

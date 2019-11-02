@@ -25,18 +25,17 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
-import org.datasyslab.geospark.enums.FileDataSplitter;
-import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.spatialRDD.PointRDD;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.datasyslab.geospark.enums.FileDataSplitter;
+import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.spatialRDD.PointRDD;
+import org.locationtech.jts.geom.Envelope;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -174,7 +173,8 @@ public class PointRangeTest
             long resultSize = RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false).count();
             assertEquals(resultSize, 2830);
         }
-        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false).take(10).get(1).getUserData().toString() != null;
+//        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false).take(10).get(1).getUserData().toString() != null;
+        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, false).take(10).get(1) != null;
     }
 
     /**
@@ -192,6 +192,7 @@ public class PointRangeTest
             long resultSize = RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, true).count();
             assertEquals(resultSize, 2830);
         }
-        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, true).take(10).get(1).getUserData().toString() != null;
+//        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, true).take(10).get(1).getUserData().toString() != null;
+        assert RangeQuery.SpatialRangeQuery(spatialRDD, queryEnvelope, false, true).take(10).get(1) != null;
     }
 }

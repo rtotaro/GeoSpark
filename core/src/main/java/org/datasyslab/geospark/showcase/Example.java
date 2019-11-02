@@ -16,12 +16,6 @@
  */
 package org.datasyslab.geospark.showcase;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.serializer.KryoSerializer;
@@ -37,6 +31,10 @@ import org.datasyslab.geospark.spatialOperator.RangeQuery;
 import org.datasyslab.geospark.spatialRDD.CircleRDD;
 import org.datasyslab.geospark.spatialRDD.PointRDD;
 import org.datasyslab.geospark.spatialRDD.PolygonRDD;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
 import java.util.List;
@@ -154,8 +152,6 @@ public class Example
         conf.set("spark.kryo.registrator", GeoSparkKryoRegistrator.class.getName());
 
         sc = new JavaSparkContext(conf);
-        Logger.getLogger("org").setLevel(Level.WARN);
-        Logger.getLogger("akka").setLevel(Level.WARN);
 
         String resourceFolder = System.getProperty("user.dir") + "/src/test/resources/";
 

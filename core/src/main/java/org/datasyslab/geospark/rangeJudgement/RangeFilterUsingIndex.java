@@ -16,9 +16,9 @@
  */
 package org.datasyslab.geospark.rangeJudgement;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.index.SpatialIndex;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.index.SpatialIndex;
 
 import java.util.ArrayList;
 import java.util.Iterator;

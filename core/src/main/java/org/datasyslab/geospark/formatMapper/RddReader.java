@@ -16,9 +16,9 @@
  */
 package org.datasyslab.geospark.formatMapper;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.apache.spark.api.java.JavaRDD;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
+import org.locationtech.jts.geom.Geometry;
 
 class RddReader
 {

@@ -29,14 +29,14 @@ package org.datasyslab.geospark.formatMapper.shapefileParser.shapes;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
-import org.datasyslab.geospark.geometryObjects.Circle;
-import org.datasyslab.geospark.geometryObjects.GeometrySerde;
 import org.junit.Assert;
 import org.junit.Test;
+import org.datasyslab.geospark.geometryObjects.Circle;
+import org.datasyslab.geospark.geometryObjects.GeometrySerde;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 import java.io.ByteArrayOutputStream;
 

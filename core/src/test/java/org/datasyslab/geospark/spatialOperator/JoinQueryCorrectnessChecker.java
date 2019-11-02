@@ -25,34 +25,20 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import org.apache.spark.storage.StorageLevel;
-import org.datasyslab.geospark.GeoSparkTestBase;
-import org.datasyslab.geospark.enums.GridType;
-import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.spatialRDD.CircleRDD;
-import org.datasyslab.geospark.spatialRDD.LineStringRDD;
-import org.datasyslab.geospark.spatialRDD.PointRDD;
-import org.datasyslab.geospark.spatialRDD.PolygonRDD;
-import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.datasyslab.geospark.GeoSparkTestBase;
+import org.datasyslab.geospark.enums.GridType;
+import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.spatialRDD.*;
+import org.locationtech.jts.geom.*;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

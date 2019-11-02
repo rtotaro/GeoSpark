@@ -16,14 +16,8 @@
  */
 package org.datasyslab.geospark.spatialPartitioning;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -17,8 +17,7 @@
 
 package org.datasyslab.geospark.showcase
 
-import com.vividsolutions.jts.geom.Polygon
-import org.apache.log4j.{Level, Logger}
+import org.locationtech.jts.geom.Polygon
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileRDD
@@ -34,9 +33,6 @@ object SpatialJoinShp extends App {
     polygon
   }
 
-
-  Logger.getLogger("org").setLevel(Level.WARN)
-  Logger.getLogger("akka").setLevel(Level.WARN)
 
   val conf = new SparkConf().setAppName("SpatialJoinSpeciesPA").setMaster("local[4]")
   val sc = new SparkContext(conf)

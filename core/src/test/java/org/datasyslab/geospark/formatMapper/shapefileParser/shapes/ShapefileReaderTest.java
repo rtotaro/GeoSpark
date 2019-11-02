@@ -26,29 +26,9 @@
 
 package org.datasyslab.geospark.formatMapper.shapefileParser.shapes;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.datasyslab.geospark.GeoSparkTestBase;
-import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileReader;
-import org.datasyslab.geospark.formatMapper.shapefileParser.boundary.BoundBox;
-import org.datasyslab.geospark.spatialOperator.RangeQuery;
-import org.datasyslab.geospark.spatialRDD.LineStringRDD;
-import org.datasyslab.geospark.spatialRDD.PointRDD;
-import org.datasyslab.geospark.spatialRDD.PolygonRDD;
-import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -58,6 +38,18 @@ import org.geotools.feature.FeatureIterator;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.datasyslab.geospark.GeoSparkTestBase;
+import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileReader;
+import org.datasyslab.geospark.formatMapper.shapefileParser.boundary.BoundBox;
+import org.datasyslab.geospark.spatialOperator.RangeQuery;
+import org.datasyslab.geospark.spatialRDD.LineStringRDD;
+import org.datasyslab.geospark.spatialRDD.PointRDD;
+import org.datasyslab.geospark.spatialRDD.PolygonRDD;
+import org.datasyslab.geospark.spatialRDD.SpatialRDD;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -65,11 +57,7 @@ import org.opengis.filter.Filter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 

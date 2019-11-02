@@ -26,20 +26,16 @@
 
 package org.datasyslab.geospark.formatMapper;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.datasyslab.geospark.GeoSparkTestBase;
-import org.datasyslab.geospark.enums.FileDataSplitter;
-import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.datasyslab.geospark.GeoSparkTestBase;
+import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+
 public class GeoJsonReaderTest
         extends GeoSparkTestBase
 {

@@ -16,9 +16,9 @@
  */
 package org.datasyslab.geospark.spatialPartitioning;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.datasyslab.geospark.spatialPartitioning.quadtree.QuadRectangle;
 import org.datasyslab.geospark.spatialPartitioning.quadtree.StandardQuadTree;
+import org.locationtech.jts.geom.Envelope;
 
 import java.io.Serializable;
 import java.util.List;

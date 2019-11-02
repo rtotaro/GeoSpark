@@ -25,8 +25,7 @@
  */
 package org.datasyslab.geospark.spatialPartitioning.quadtree;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

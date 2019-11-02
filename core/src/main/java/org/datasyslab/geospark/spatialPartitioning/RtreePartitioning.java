@@ -16,8 +16,10 @@
  */
 package org.datasyslab.geospark.spatialPartitioning;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.index.strtree.AbstractNode;
+import org.locationtech.jts.index.strtree.Boundable;
+import org.locationtech.jts.index.strtree.STRtree;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -52,9 +54,59 @@ public class RtreePartitioning
             strtree.insert(sample, sample);
         }
 
-        List<Envelope> envelopes = strtree.queryBoundary();
+        List<Envelope> envelopes = queryBoundary(strtree);
         for (Envelope envelope : envelopes) {
             grids.add(envelope);
+        }
+    }
+
+    protected List queryBoundary(STRtree strtree)
+    {
+        strtree.build();
+        List boundaries = new ArrayList();
+        if (strtree.isEmpty()) {
+            //Assert.isTrue(root.getBounds() == null);
+            //If the root is empty, we stop traversing. This should not happen.
+            return boundaries;
+        }
+
+        queryBoundary(strtree.getRoot(), boundaries);
+
+        return boundaries;
+    }
+    /**
+     * This function is to traverse the children of the root.
+     * @param node
+     * @param boundaries
+     */
+    private void queryBoundary(AbstractNode node, List boundaries) {
+        List childBoundables = node.getChildBoundables();
+        boolean flagLeafnode=true;
+        for (int i = 0; i < childBoundables.size(); i++) {
+            Boundable childBoundable = (Boundable) childBoundables.get(i);
+            if (childBoundable instanceof AbstractNode) {
+                //We find this is not a leaf node.
+                flagLeafnode=false;
+                break;
+
+            }
+        }
+        if(flagLeafnode==true)
+        {
+            boundaries.add((Envelope)node.getBounds());
+            return;
+        }
+        else
+        {
+            for (int i = 0; i < childBoundables.size(); i++)
+            {
+                Boundable childBoundable = (Boundable) childBoundables.get(i);
+                if (childBoundable instanceof AbstractNode)
+                {
+                    queryBoundary((AbstractNode) childBoundable, boundaries);
+                }
+
+            }
         }
     }
 
@@ -65,7 +117,6 @@ public class RtreePartitioning
      */
     public List<Envelope> getGrids()
     {
-
         return this.grids;
     }
 }

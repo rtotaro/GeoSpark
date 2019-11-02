@@ -25,11 +25,11 @@
  */
 package org.datasyslab.geospark.spatialRDD;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.datasyslab.geospark.GeoSparkTestBase;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.enums.IndexType;
+import org.locationtech.jts.geom.Envelope;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -16,12 +16,12 @@
  */
 package org.datasyslab.geospark.formatMapper.shapefileParser.shapes;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.ShapeParser;
 import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.ShapeReaderFactory;
 import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.ShapeType;
 import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.TypeUnknownException;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -16,21 +16,16 @@
  */
 package org.datasyslab.geospark.formatMapper;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKBReader;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.operation.valid.IsValidOp;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.GeometryType;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKBReader;
+import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.operation.valid.IsValidOp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.jts2geojson.GeoJSONReader;
@@ -91,7 +86,7 @@ public class FormatMapper<T extends Geometry>
     transient protected WKTReader wktReader = new WKTReader();
     // For some unknown reasons, the wkb reader cannot be used in transient variable like the wkt reader.
 
-    final static Logger logger = Logger.getLogger(FormatMapper.class);
+    final static Logger logger = LoggerFactory.getLogger(FormatMapper.class);
     /**
      * Instantiates a new format mapper.
      *
@@ -163,7 +158,7 @@ public class FormatMapper<T extends Geometry>
     {
         final Geometry geometry;
         if (geoJson.contains("Feature")) {
-            Feature feature = (Feature) GeoJSONFactory.create(geoJson);
+            org.wololo.geojson.Feature feature = (org.wololo.geojson.Feature) GeoJSONFactory.create(geoJson);
             ArrayList<String> nonSpatialData = new ArrayList<>();
             Map<String, Object> featurePropertiesproperties = feature.getProperties();
             if (feature.getId()!=null)
@@ -191,7 +186,7 @@ public class FormatMapper<T extends Geometry>
     public static List<String> readGeoJsonPropertyNames(String geoJson){
         if (geoJson.contains("Feature") || geoJson.contains("feature") || geoJson.contains("FEATURE")) {
             if (geoJson.contains("properties") ) {
-                Feature feature = (Feature) GeoJSONFactory.create(geoJson);
+                org.wololo.geojson.Feature feature = (Feature) GeoJSONFactory.create(geoJson);
                 if (Objects.isNull(feature.getId())){
                     return new ArrayList(feature.getProperties().keySet());
                 }

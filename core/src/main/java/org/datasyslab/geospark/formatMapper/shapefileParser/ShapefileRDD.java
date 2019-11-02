@@ -16,14 +16,6 @@
  */
 package org.datasyslab.geospark.formatMapper.shapefileParser;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -37,6 +29,7 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.TypeU
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
+import org.locationtech.jts.geom.*;
 import scala.Tuple2;
 
 import java.io.IOException;

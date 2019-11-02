@@ -25,18 +25,18 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
-import org.datasyslab.geospark.enums.GridType;
-import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.enums.JoinBuildSide;
-import org.datasyslab.geospark.spatialRDD.LineStringRDD;
-import org.datasyslab.geospark.spatialRDD.PolygonRDD;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.datasyslab.geospark.enums.GridType;
+import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.enums.JoinBuildSide;
+import org.datasyslab.geospark.spatialRDD.LineStringRDD;
+import org.datasyslab.geospark.spatialRDD.PolygonRDD;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import scala.Tuple2;
 
 import java.util.Arrays;

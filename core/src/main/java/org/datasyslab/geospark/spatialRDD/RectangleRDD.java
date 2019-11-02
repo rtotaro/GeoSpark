@@ -16,14 +16,14 @@
  */
 package org.datasyslab.geospark.spatialRDD;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Polygon;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.formatMapper.RectangleFormatMapper;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Polygon;
 
 // TODO: Auto-generated Javadoc
 
@@ -304,7 +304,7 @@ public class RectangleRDD
      * @param newLevel the new level
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation, Integer Offset,
-            FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel)
+                        FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation, partitions).mapPartitions(new RectangleFormatMapper(Offset, splitter, carryInputData)));
         this.analyze(newLevel);
@@ -321,7 +321,7 @@ public class RectangleRDD
      * @param newLevel the new level
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation, Integer Offset,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
+                        FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation).mapPartitions(new RectangleFormatMapper(Offset, splitter, carryInputData)));
         this.analyze(newLevel);
@@ -338,7 +338,7 @@ public class RectangleRDD
      * @param newLevel the new level
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation,
-            FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel)
+                        FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation, partitions).mapPartitions(new RectangleFormatMapper(splitter, carryInputData)));
         this.analyze(newLevel);
@@ -354,7 +354,7 @@ public class RectangleRDD
      * @param newLevel the new level
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
+                        FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation).mapPartitions(new RectangleFormatMapper(splitter, carryInputData)));
         this.analyze(newLevel);
@@ -418,7 +418,7 @@ public class RectangleRDD
      * @param targetEpsgCode the target epsg code
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation, Integer Offset,
-            FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                        FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation, partitions).mapPartitions(new RectangleFormatMapper(splitter, carryInputData)));
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -438,7 +438,7 @@ public class RectangleRDD
      * @param targetEpsgCode the target epsg code
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation, Integer Offset,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                        FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation).mapPartitions(new RectangleFormatMapper(Offset, splitter, carryInputData)));
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -458,7 +458,7 @@ public class RectangleRDD
      * @param targetEpsgCode the target epsg code
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation,
-            FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                        FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation, partitions).mapPartitions(new RectangleFormatMapper(splitter, carryInputData)));
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -477,7 +477,7 @@ public class RectangleRDD
      * @param targetEpsgCode the target epsg code
      */
     public RectangleRDD(JavaSparkContext sparkContext, String InputLocation,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                        FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.setRawSpatialRDD(sparkContext.textFile(InputLocation).mapPartitions(new RectangleFormatMapper(splitter, carryInputData)));
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);

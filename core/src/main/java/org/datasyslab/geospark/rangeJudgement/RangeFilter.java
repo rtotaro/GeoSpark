@@ -16,8 +16,8 @@
  */
 package org.datasyslab.geospark.rangeJudgement;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.apache.spark.api.java.function.Function;
+import org.locationtech.jts.geom.Geometry;
 
 // TODO: Auto-generated Javadoc
 

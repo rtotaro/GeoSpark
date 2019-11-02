@@ -16,12 +16,12 @@
  */
 package org.datasyslab.geospark.utils;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.spark.SparkConf;
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.enums.JoinBuildSide;
 import org.datasyslab.geospark.enums.JoinSparitionDominantSide;
+import org.locationtech.jts.geom.Envelope;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

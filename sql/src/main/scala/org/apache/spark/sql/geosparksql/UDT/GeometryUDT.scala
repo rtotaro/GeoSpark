@@ -16,7 +16,6 @@
  */
 package org.apache.spark.sql.geosparksql.UDT
 
-import com.vividsolutions.jts.geom.Geometry
 import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
 import org.apache.spark.sql.types._
 import org.datasyslab.geosparksql.utils.GeometrySerializer

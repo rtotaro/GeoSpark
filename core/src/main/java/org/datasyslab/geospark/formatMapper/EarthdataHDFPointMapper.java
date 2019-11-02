@@ -16,18 +16,17 @@
  */
 package org.datasyslab.geospark.formatMapper;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.datasyslab.sernetcdf.SerNetCDFUtils;
-import ucar.ma2.Array;
-import ucar.nc2.dataset.NetcdfDataset;
+import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+//import org.datasyslab.sernetcdf.SerNetCDFUtils;
+//import ucar.ma2.Array;
+//import ucar.nc2.dataset.NetcdfDataset;
 
 // TODO: Auto-generated Javadoc
 
@@ -228,43 +227,44 @@ public class EarthdataHDFPointMapper
             throws Exception
     {
         List<Geometry> hdfData = new ArrayList<Geometry>();
-        while (stringIterator.hasNext()) {
-            String hdfAddress = stringIterator.next();
-            NetcdfDataset netcdfSet = SerNetCDFUtils.loadNetCDFDataSet(urlPrefix + hdfAddress);
-            Array longitudeArray = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, this.longitudePath);
-            Array latitudeArray = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, this.latitudePath);
-            Array dataArray = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, this.dataPath);
-            Array[] dataArrayList = new Array[this.dataVariableList.length];
-            for (int i = 0; i < this.dataVariableList.length; i++) {
-                dataArrayList[i] = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, dataPathList[i]);
-            }
-            int[] geolocationShape = longitudeArray.getShape();
-            GeometryFactory geometryFactory = new GeometryFactory();
-            for (int j = 0; j < geolocationShape[0]; j++) {
-                for (int i = 0; i < geolocationShape[1]; i++) {
-                    // We probably need to switch longitude and latitude if needed.
-                    Coordinate coordinate = null;
-                    if (switchCoordinateXY) {
-                        coordinate = new Coordinate(SerNetCDFUtils.getDataSym(longitudeArray, j, i),
-                                SerNetCDFUtils.getDataSym(latitudeArray, j, i), SerNetCDFUtils.getDataAsym(dataArray, j, i, offset, increment));
-                    }
-                    else {
-                        coordinate = new Coordinate(SerNetCDFUtils.getDataSym(latitudeArray, j, i),
-                                SerNetCDFUtils.getDataSym(longitudeArray, j, i), SerNetCDFUtils.getDataAsym(dataArray, j, i, offset, increment));
-                    }
-                    Point observation = geometryFactory.createPoint(coordinate);
-                    String userData = "";
-
-                    for (int k = 0; k < dataVariableList.length - 1; k++) {
-                        userData += SerNetCDFUtils.getDataAsym(dataArrayList[k], j, i, offset, increment) + " ";
-                    }
-                    userData += SerNetCDFUtils.getDataAsym(dataArrayList[dataVariableList.length - 1], j, i, offset, increment);
-
-                    observation.setUserData(userData);
-                    hdfData.add(observation);
-                }
-            }
-        }
-        return hdfData.iterator();
+//        while (stringIterator.hasNext()) {
+//            String hdfAddress = stringIterator.next();
+//            NetcdfDataset netcdfSet = SerNetCDFUtils.loadNetCDFDataSet(urlPrefix + hdfAddress);
+//            Array longitudeArray = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, this.longitudePath);
+//            Array latitudeArray = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, this.latitudePath);
+//            Array dataArray = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, this.dataPath);
+//            Array[] dataArrayList = new Array[this.dataVariableList.length];
+//            for (int i = 0; i < this.dataVariableList.length; i++) {
+//                dataArrayList[i] = SerNetCDFUtils.getNetCDF2DArray(netcdfSet, dataPathList[i]);
+//            }
+//            int[] geolocationShape = longitudeArray.getShape();
+//            GeometryFactory geometryFactory = new GeometryFactory();
+//            for (int j = 0; j < geolocationShape[0]; j++) {
+//                for (int i = 0; i < geolocationShape[1]; i++) {
+//                    // We probably need to switch longitude and latitude if needed.
+//                    Coordinate coordinate = null;
+//                    if (switchCoordinateXY) {
+//                        coordinate = new Coordinate(SerNetCDFUtils.getDataSym(longitudeArray, j, i),
+//                                SerNetCDFUtils.getDataSym(latitudeArray, j, i), SerNetCDFUtils.getDataAsym(dataArray, j, i, offset, increment));
+//                    }
+//                    else {
+//                        coordinate = new Coordinate(SerNetCDFUtils.getDataSym(latitudeArray, j, i),
+//                                SerNetCDFUtils.getDataSym(longitudeArray, j, i), SerNetCDFUtils.getDataAsym(dataArray, j, i, offset, increment));
+//                    }
+//                    Point observation = geometryFactory.createPoint(coordinate);
+//                    String userData = "";
+//
+//                    for (int k = 0; k < dataVariableList.length - 1; k++) {
+//                        userData += SerNetCDFUtils.getDataAsym(dataArrayList[k], j, i, offset, increment) + " ";
+//                    }
+//                    userData += SerNetCDFUtils.getDataAsym(dataArrayList[dataVariableList.length - 1], j, i, offset, increment);
+//
+//                    observation.setUserData(userData);
+//                    hdfData.add(observation);
+//                }
+//            }
+//        }
+//        return hdfData.iterator();
+        throw  new NotImplementedException("EarthdataHDFPointMapper");
     }
 }

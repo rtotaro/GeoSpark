@@ -18,33 +18,29 @@
 package org.datasyslab.geospark.serde;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
-import com.vividsolutions.jts.index.strtree.STRtree;
-import org.apache.log4j.Logger;
 import org.apache.spark.serializer.KryoRegistrator;
 import org.datasyslab.geospark.geometryObjects.Circle;
 import org.datasyslab.geospark.geometryObjects.GeometrySerde;
-import org.datasyslab.geospark.geometryObjects.SpatialIndexSerde;
+import org.datasyslab.geospark.geometryObjects.JavaSpatialIndexSerde;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.index.quadtree.Quadtree;
+import org.locationtech.jts.index.strtree.STRtree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+//import org.datasyslab.geospark.geometryObjects.SpatialIndexSerde;
 
 public class GeoSparkKryoRegistrator
         implements KryoRegistrator
 {
 
-    final static Logger log = Logger.getLogger(GeoSparkKryoRegistrator.class);
+    final static Logger log = LoggerFactory.getLogger(GeoSparkKryoRegistrator.class);
 
     @Override
     public void registerClasses(Kryo kryo)
     {
         GeometrySerde serializer = new GeometrySerde();
-        SpatialIndexSerde indexSerializer = new SpatialIndexSerde(serializer);
+//        SpatialIndexSerde indexSerializer = new SpatialIndexSerde(serializer);
 
         log.info("Registering custom serializers for geometry types");
 
@@ -58,7 +54,8 @@ public class GeoSparkKryoRegistrator
         kryo.register(Circle.class, serializer);
         kryo.register(Envelope.class, serializer);
         // TODO: Replace the default serializer with default spatial index serializer
-        kryo.register(Quadtree.class, indexSerializer);
-        kryo.register(STRtree.class, indexSerializer);
+        kryo.register(Quadtree.class, new JavaSpatialIndexSerde());
+        kryo.register(STRtree.class, new JavaSpatialIndexSerde());
+
     }
 }

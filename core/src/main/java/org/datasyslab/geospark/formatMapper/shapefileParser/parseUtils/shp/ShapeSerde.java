@@ -18,14 +18,7 @@
 package org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp;
 
 import com.esotericsoftware.kryo.io.Input;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

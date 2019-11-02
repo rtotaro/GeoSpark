@@ -29,22 +29,17 @@ package org.datasyslab.geospark.geometryObjects;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
-import com.vividsolutions.jts.index.strtree.STRtree;
 import org.junit.Test;
+import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.index.SpatialIndex;
+import org.locationtech.jts.index.quadtree.Quadtree;
+import org.locationtech.jts.index.strtree.STRtree;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Random;
 
@@ -58,15 +53,17 @@ public class SpatialIndexSerdeTest
 
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
-    private final SpatialIndexSerde spatialIndexSerde = new SpatialIndexSerde();
+//    private final SpatialIndexSerde spatialIndexSerde = new SpatialIndexSerde();
 
     @Test
     public void test()
             throws Exception
     {
 
-        kryo.register(Quadtree.class, spatialIndexSerde);
-        kryo.register(STRtree.class, spatialIndexSerde);
+//        kryo.register(Quadtree.class);//, spatialIndexSerde);
+//        kryo.register(STRtree.class);//, spatialIndexSerde);
+
+        new GeoSparkKryoRegistrator().registerClasses(kryo);
 
         // test correctness
         testCorrectness(Quadtree.class);
@@ -114,8 +111,8 @@ public class SpatialIndexSerdeTest
         byte[] noSerde = serializeIndexNoKryo(tree);
 
         // do with serde
-        if (aClass == Quadtree.class) { kryo.register(Quadtree.class, new SpatialIndexSerde()); }
-        else { kryo.register(STRtree.class, new SpatialIndexSerde()); }
+        if (aClass == Quadtree.class) { kryo.register(Quadtree.class); }
+        else { kryo.register(STRtree.class); }
         byte[] withSerde = serializeIndexKryo(tree);
 
         System.out.println("\n==== test size of " + aClass.toString() + "====");
@@ -143,8 +140,8 @@ public class SpatialIndexSerdeTest
         after = System.currentTimeMillis();
         System.out.println("original deserialize time : " + (after - before) / 1000);
         // do with serde
-        if (aClass == Quadtree.class) { kryo.register(Quadtree.class, new SpatialIndexSerde()); }
-        else { kryo.register(STRtree.class, new SpatialIndexSerde()); }
+        if (aClass == Quadtree.class) { kryo.register(Quadtree.class); }
+        else { kryo.register(STRtree.class); }
 
         before = System.currentTimeMillis();
         byte[] withSerde = serializeIndexKryo(tree);

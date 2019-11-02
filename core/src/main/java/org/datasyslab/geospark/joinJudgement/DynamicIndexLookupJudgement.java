@@ -16,29 +16,23 @@
  */
 package org.datasyslab.geospark.joinJudgement;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
-import com.vividsolutions.jts.index.strtree.STRtree;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.function.FlatMapFunction2;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.enums.JoinBuildSide;
 import org.datasyslab.geospark.monitoring.GeoSparkMetric;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.index.SpatialIndex;
+import org.locationtech.jts.index.quadtree.Quadtree;
+import org.locationtech.jts.index.strtree.STRtree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static org.datasyslab.geospark.utils.TimeUtils.elapsedSince;
 
@@ -47,7 +41,7 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
         implements FlatMapFunction2<Iterator<U>, Iterator<T>, Pair<U, T>>, Serializable
 {
 
-    private static final Logger log = LogManager.getLogger(DynamicIndexLookupJudgement.class);
+    private static final Logger log = LoggerFactory.getLogger(DynamicIndexLookupJudgement.class);
 
     private final IndexType indexType;
     private final JoinBuildSide joinBuildSide;
@@ -227,7 +221,7 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
 
     private void log(String message, Object... params)
     {
-        if (Level.INFO.isGreaterOrEqual(log.getEffectiveLevel())) {
+        if (log.isInfoEnabled()) {
             final int partitionId = TaskContext.getPartitionId();
             final long threadId = Thread.currentThread().getId();
             log.info("[" + threadId + ", PID=" + partitionId + "] " + String.format(message, params));

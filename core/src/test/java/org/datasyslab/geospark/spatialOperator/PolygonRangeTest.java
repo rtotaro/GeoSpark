@@ -25,18 +25,18 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
-import org.datasyslab.geospark.enums.FileDataSplitter;
-import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.spatialRDD.PolygonRDD;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.datasyslab.geospark.enums.FileDataSplitter;
+import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.spatialRDD.PolygonRDD;
+import org.locationtech.jts.geom.Envelope;
 
 import java.io.IOException;
 import java.io.InputStream;

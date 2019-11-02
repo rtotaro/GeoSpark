@@ -17,22 +17,16 @@
 
 package org.datasyslab.geospark.spatialPartitioning;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
 import org.datasyslab.geospark.utils.HalfOpenRectangle;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import scala.Tuple2;
 
 import javax.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class KDBTreePartitioner
         extends SpatialPartitioner

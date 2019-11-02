@@ -17,9 +17,9 @@
 
 package org.datasyslab.geospark.rangeJudgement;
 
-import com.vividsolutions.jts.geom.Geometry;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
@@ -27,7 +27,7 @@ public class JudgementBase<U extends Geometry>
         implements Serializable
 {
 
-    private static final Logger log = LogManager.getLogger(JudgementBase.class);
+    private static final Logger log = LoggerFactory.getLogger(JudgementBase.class);
     private boolean considerBoundaryIntersection;
     U queryGeometry;
     protected boolean leftCoveredByRight = true;

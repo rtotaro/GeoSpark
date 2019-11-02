@@ -27,9 +27,7 @@ package org.datasyslab.geospark.spatialPartitioning.quadtree;
 
 import org.apache.log4j.Logger;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;

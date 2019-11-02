@@ -16,8 +16,6 @@
  */
 package org.datasyslab.geospark.spatialRDD;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -25,6 +23,8 @@ import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.formatMapper.FormatMapper;
 import org.datasyslab.geospark.formatMapper.LineStringFormatMapper;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.LineString;
 
 // TODO: Auto-generated Javadoc
 
@@ -309,7 +309,7 @@ public class LineStringRDD
      * @param newLevel the new level
      */
     public LineStringRDD(JavaSparkContext sparkContext, String InputLocation, Integer startOffset, Integer endOffset,
-            FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel)
+                         FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel)
     {
         this(sparkContext, InputLocation, startOffset, endOffset, splitter, carryInputData, partitions, newLevel, null, null);
     }
@@ -326,7 +326,7 @@ public class LineStringRDD
      * @param newLevel the new level
      */
     public LineStringRDD(JavaSparkContext sparkContext, String InputLocation, Integer startOffset, Integer endOffset,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
+                         FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
     {
         this(sparkContext, InputLocation, startOffset, endOffset, splitter, carryInputData, null, newLevel, null, null);
     }
@@ -356,7 +356,7 @@ public class LineStringRDD
      * @param newLevel the new level
      */
     public LineStringRDD(JavaSparkContext sparkContext, String InputLocation,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
+                         FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel)
     {
         this(sparkContext, InputLocation, null, null, splitter, carryInputData, null, newLevel, null, null);
     }
@@ -420,7 +420,7 @@ public class LineStringRDD
      * @param targetEpsgCode the target epsg code
      */
     public LineStringRDD(JavaSparkContext sparkContext, String InputLocation, Integer startOffset, Integer endOffset,
-            FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                         FileDataSplitter splitter, boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         JavaRDD rawTextRDD = partitions != null ? sparkContext.textFile(InputLocation, partitions) : sparkContext.textFile(InputLocation);
         if (startOffset != null && endOffset != null) {
@@ -448,7 +448,7 @@ public class LineStringRDD
      * @param targetEpsgCode the target epsg code
      */
     public LineStringRDD(JavaSparkContext sparkContext, String InputLocation, Integer startOffset, Integer endOffset,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                         FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this(sparkContext, InputLocation, startOffset, endOffset, splitter, carryInputData, null, newLevel, sourceEpsgCRSCode, targetEpsgCode);
     }
@@ -482,7 +482,7 @@ public class LineStringRDD
      * @param targetEpsgCode the target epsg code
      */
     public LineStringRDD(JavaSparkContext sparkContext, String InputLocation,
-            FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                         FileDataSplitter splitter, boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this(sparkContext, InputLocation, null, null, splitter, carryInputData, null, newLevel, sourceEpsgCRSCode, targetEpsgCode);
     }

@@ -16,8 +16,7 @@
  */
 package org.datasyslab.geospark.showcase
 
-import com.vividsolutions.jts.geom.Envelope
-import org.apache.log4j.{Level, Logger}
+import org.locationtech.jts.geom.Envelope
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.storage.StorageLevel
 import org.datasyslab.geospark.enums.{FileDataSplitter, IndexType}
@@ -28,8 +27,6 @@ import org.datasyslab.geospark.spatialRDD.PointRDD
 object ScalaEarthdataMapperRunnableExample extends App {
   val conf = new SparkConf().setAppName("EarthdataMapperRunnableExample").setMaster("local[2]")
   val sc = new SparkContext(conf)
-  Logger.getLogger("org").setLevel(Level.WARN)
-  Logger.getLogger("akka").setLevel(Level.WARN)
   val InputLocation = System.getProperty("user.dir") + "/src/test/resources/modis/modis.csv"
   val splitter = FileDataSplitter.CSV
   val indexType = IndexType.RTREE

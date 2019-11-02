@@ -16,15 +16,14 @@
  */
 package org.datasyslab.geospark.spatialPartitioning;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import org.apache.spark.Partitioner;
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import scala.Tuple2;
 
 import javax.annotation.Nullable;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;

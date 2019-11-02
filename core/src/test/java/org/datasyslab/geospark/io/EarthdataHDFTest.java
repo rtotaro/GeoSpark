@@ -25,20 +25,20 @@
  */
 package org.datasyslab.geospark.io;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.formatMapper.EarthdataHDFPointMapper;
 import org.datasyslab.geospark.spatialOperator.RangeQuery;
 import org.datasyslab.geospark.spatialRDD.PointRDD;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.locationtech.jts.geom.Envelope;
 
 // TODO: Auto-generated Javadoc
 

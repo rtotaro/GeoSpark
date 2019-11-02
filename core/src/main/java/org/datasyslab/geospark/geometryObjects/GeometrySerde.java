@@ -22,18 +22,10 @@ import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.apache.log4j.Logger;
 import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.ShapeSerde;
+import org.locationtech.jts.geom.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides methods to efficiently serialize and deserialize geometry types.
@@ -48,7 +40,7 @@ public class GeometrySerde
         extends Serializer
 {
 
-    private static final Logger log = Logger.getLogger(GeometrySerde.class);
+    private static final Logger log = LoggerFactory.getLogger(GeometrySerde.class);
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     private enum Type

@@ -25,8 +25,9 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.CombineFileSplit;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.log4j.Logger;
 import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.ShapeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -89,7 +90,7 @@ public class CombineShapeReader
     /**
      * dubug logger
      */
-    final static Logger logger = Logger.getLogger(CombineShapeReader.class);
+    final static Logger logger = LoggerFactory.getLogger(CombineShapeReader.class);
 
     /**
      * cut the combined split into FileSplit for .shp, .shx and .dbf

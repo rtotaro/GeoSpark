@@ -16,8 +16,7 @@
  */
 package org.datasyslab.geospark.showcase
 
-import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory}
-import org.apache.log4j.{Level, Logger}
+import org.locationtech.jts.geom.{Coordinate, Envelope, GeometryFactory}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
@@ -26,6 +25,7 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileRDD
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialOperator.{JoinQuery, KNNQuery, RangeQuery}
 import org.datasyslab.geospark.spatialRDD.{CircleRDD, PointRDD, PolygonRDD}
+import org.slf4j.{Logger, LoggerFactory}
 
 
 /**
@@ -38,8 +38,8 @@ object ScalaExample extends App {
   conf.set("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
 
   val sc = new SparkContext(conf)
-  Logger.getLogger("org").setLevel(Level.WARN)
-  Logger.getLogger("akka").setLevel(Level.WARN)
+  LoggerFactory.getLogger("org")
+  LoggerFactory.getLogger("akka")
 
   val resourceFolder = System.getProperty("user.dir") + "/src/test/resources/"
 

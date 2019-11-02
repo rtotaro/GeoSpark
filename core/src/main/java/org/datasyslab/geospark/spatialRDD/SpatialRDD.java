@@ -16,14 +16,6 @@
  */
 package org.datasyslab.geospark.spatialRDD;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.index.SpatialIndex;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
@@ -31,38 +23,29 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.random.SamplingUtils;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.spatialPartitioning.EqualPartitioning;
-import org.datasyslab.geospark.spatialPartitioning.FlatGridPartitioner;
-import org.datasyslab.geospark.spatialPartitioning.HilbertPartitioning;
-import org.datasyslab.geospark.spatialPartitioning.KDBTree;
-import org.datasyslab.geospark.spatialPartitioning.KDBTreePartitioner;
-import org.datasyslab.geospark.spatialPartitioning.QuadtreePartitioning;
-import org.datasyslab.geospark.spatialPartitioning.RtreePartitioning;
-import org.datasyslab.geospark.spatialPartitioning.SpatialPartitioner;
-import org.datasyslab.geospark.spatialPartitioning.VoronoiPartitioning;
+import org.datasyslab.geospark.spatialPartitioning.*;
 import org.datasyslab.geospark.spatialPartitioning.quadtree.QuadTreePartitioner;
 import org.datasyslab.geospark.spatialPartitioning.quadtree.StandardQuadTree;
 import org.datasyslab.geospark.spatialRddTool.IndexBuilder;
 import org.datasyslab.geospark.spatialRddTool.StatCalculator;
 import org.datasyslab.geospark.utils.RDDSampleUtils;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.index.SpatialIndex;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.jts2geojson.GeoJSONWriter;
 import scala.Tuple2;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // TODO: Auto-generated Javadoc
 
@@ -76,7 +59,7 @@ public class SpatialRDD<T extends Geometry>
     /**
      * The Constant logger.
      */
-    final static Logger logger = Logger.getLogger(SpatialRDD.class);
+    final static Logger logger = LoggerFactory.getLogger(SpatialRDD.class);
 
     /**
      * The total number of records.

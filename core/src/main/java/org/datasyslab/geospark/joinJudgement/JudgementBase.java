@@ -16,18 +16,13 @@
  */
 package org.datasyslab.geospark.joinJudgement;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.TaskContext;
 import org.datasyslab.geospark.utils.HalfOpenRectangle;
+import org.locationtech.jts.geom.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -54,7 +49,7 @@ import java.util.List;
 abstract class JudgementBase
         implements Serializable
 {
-    private static final Logger log = LogManager.getLogger(JudgementBase.class);
+    private static final Logger log = LoggerFactory.getLogger(JudgementBase.class);
 
     private final boolean considerBoundaryIntersection;
     private final DedupParams dedupParams;

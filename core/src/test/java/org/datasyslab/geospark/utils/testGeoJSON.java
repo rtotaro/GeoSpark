@@ -25,9 +25,6 @@
  */
 package org.datasyslab.geospark.utils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -35,6 +32,9 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.jts2geojson.GeoJSONWriter;
 

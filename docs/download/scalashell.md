@@ -9,7 +9,7 @@ This mode currently works with GeoSpark-core and GeoSparkViz.
 
 2. Run Spark shell with `--packages` option. This command will automatically download GeoSpark jars from Maven Central.
 ```
-./bin/spark-shell --packages org.datasyslab:geospark:GEOSPARK_VERSION
+./bin/spark-shell --packages org.datasyslab.geospark_VERSION
 ```
 
 * Local mode: test GeoSpark without setting up a cluster

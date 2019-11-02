@@ -26,7 +26,6 @@
 
 package org.datasyslab.geospark
 
-import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.storage.StorageLevel
@@ -38,6 +37,7 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialOperator.JoinQuery.JoinParams
 import org.datasyslab.geospark.spatialOperator.{JoinQuery, KNNQuery, RangeQuery}
 import org.datasyslab.geospark.spatialRDD.{CircleRDD, PointRDD, PolygonRDD}
+import org.locationtech.jts.geom.{Coordinate, Envelope, GeometryFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
 
 class scalaTest extends FunSpec with BeforeAndAfterAll {

@@ -16,8 +16,6 @@
  */
 package org.datasyslab.geospark.spatialRDD;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Point;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -25,6 +23,8 @@ import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.formatMapper.FormatMapper;
 import org.datasyslab.geospark.formatMapper.PointFormatMapper;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Point;
 
 // TODO: Auto-generated Javadoc
 
@@ -411,7 +411,7 @@ public class PointRDD
      * @param targetEpsgCode the target epsg code
      */
     public PointRDD(JavaSparkContext sparkContext, String InputLocation, Integer Offset, FileDataSplitter splitter,
-            boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                    boolean carryInputData, Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         JavaRDD rawTextRDD = partitions != null ? sparkContext.textFile(InputLocation, partitions) : sparkContext.textFile(InputLocation);
         if (Offset != null) {this.setRawSpatialRDD(rawTextRDD.mapPartitions(new PointFormatMapper(Offset, splitter, carryInputData)));}
@@ -434,7 +434,7 @@ public class PointRDD
      * @param targetEpsgCode the target epsg code
      */
     public PointRDD(JavaSparkContext sparkContext, String InputLocation, Integer Offset, FileDataSplitter splitter,
-            boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                    boolean carryInputData, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this(sparkContext, InputLocation, Offset, splitter, carryInputData, null, newLevel, sourceEpsgCRSCode, targetEpsgCode);
     }
@@ -452,7 +452,7 @@ public class PointRDD
      * @param targetEpsgCode the target epsg code
      */
     public PointRDD(JavaSparkContext sparkContext, String InputLocation, FileDataSplitter splitter, boolean carryInputData,
-            Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                    Integer partitions, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this(sparkContext, InputLocation, null, splitter, carryInputData, partitions, newLevel, sourceEpsgCRSCode, targetEpsgCode);
     }
@@ -469,7 +469,7 @@ public class PointRDD
      * @param targetEpsgCode the target epsg code
      */
     public PointRDD(JavaSparkContext sparkContext, String InputLocation, FileDataSplitter splitter, boolean carryInputData,
-            StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                    StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this(sparkContext, InputLocation, null, splitter, carryInputData, null, newLevel, sourceEpsgCRSCode, targetEpsgCode);
     }
@@ -486,7 +486,7 @@ public class PointRDD
      * @param targetEpsgCode the target epsg code
      */
     public PointRDD(JavaSparkContext sparkContext, String InputLocation, Integer partitions, FlatMapFunction userSuppliedMapper,
-            StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+                    StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this(sparkContext, InputLocation, null, null, false, partitions, newLevel, sourceEpsgCRSCode, targetEpsgCode);
     }

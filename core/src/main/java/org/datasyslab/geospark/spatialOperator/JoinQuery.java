@@ -16,10 +16,7 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -28,16 +25,15 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.enums.JoinBuildSide;
 import org.datasyslab.geospark.geometryObjects.Circle;
-import org.datasyslab.geospark.joinJudgement.DedupParams;
-import org.datasyslab.geospark.joinJudgement.DynamicIndexLookupJudgement;
-import org.datasyslab.geospark.joinJudgement.LeftIndexLookupJudgement;
-import org.datasyslab.geospark.joinJudgement.NestedLoopJudgement;
-import org.datasyslab.geospark.joinJudgement.RightIndexLookupJudgement;
+import org.datasyslab.geospark.joinJudgement.*;
 import org.datasyslab.geospark.monitoring.GeoSparkMetric;
 import org.datasyslab.geospark.monitoring.GeoSparkMetrics;
 import org.datasyslab.geospark.spatialPartitioning.SpatialPartitioner;
 import org.datasyslab.geospark.spatialRDD.CircleRDD;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
+import org.locationtech.jts.geom.Geometry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.util.HashSet;
@@ -45,7 +41,7 @@ import java.util.Objects;
 
 public class JoinQuery
 {
-    private static final Logger log = LogManager.getLogger(JoinQuery.class);
+    private static final Logger log = LoggerFactory.getLogger(JoinQuery.class);
 
     private static <U extends Geometry, T extends Geometry> void verifyCRSMatch(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD)
             throws Exception
