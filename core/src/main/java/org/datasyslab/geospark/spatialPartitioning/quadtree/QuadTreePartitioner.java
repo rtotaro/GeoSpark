@@ -20,9 +20,11 @@ import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
 import org.datasyslab.geospark.spatialPartitioning.SpatialPartitioner;
 import org.datasyslab.geospark.utils.HalfOpenRectangle;
+import org.datasyslab.geospark.utils.SimpleFeatureUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.opengis.feature.simple.SimpleFeature;
 import scala.Tuple2;
 
 import javax.annotation.Nullable;
@@ -44,12 +46,12 @@ public class QuadTreePartitioner
     }
 
     @Override
-    public <T extends Geometry> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
+    public <T extends SimpleFeature> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
             throws Exception
     {
         Objects.requireNonNull(spatialObject, "spatialObject");
 
-        final Envelope envelope = spatialObject.getEnvelopeInternal();
+        final Envelope envelope = SimpleFeatureUtils.getEnvelopeInternal(spatialObject);
 
         final List<QuadRectangle> matchedPartitions = quadTree.findZones(new QuadRectangle(envelope));
 

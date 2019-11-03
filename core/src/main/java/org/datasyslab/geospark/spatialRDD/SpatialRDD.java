@@ -23,6 +23,8 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.random.SamplingUtils;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.datasyslab.geospark.enums.GridType;
@@ -52,7 +54,7 @@ import java.util.*;
 /**
  * The Class SpatialRDD.
  */
-public class SpatialRDD<T extends Geometry>
+public class SpatialRDD<T extends GeometryFeature>
         implements Serializable
 {
 
@@ -160,7 +162,7 @@ public class SpatialRDD<T extends Geometry>
                 public T call(T originalObject)
                         throws Exception
                 {
-                    return (T) JTS.transform(originalObject, transform);
+                    return (T)originalObject.transform(transform);
                 }
             });
             return true;
@@ -517,7 +519,7 @@ public class SpatialRDD<T extends Geometry>
                 ArrayList<String> result = new ArrayList();
                 GeoJSONWriter writer = new GeoJSONWriter();
                 while (iterator.hasNext()) {
-                    Geometry spatialObject = (Geometry) iterator.next();
+                    Geometry spatialObject = (Geometry) iterator.next().getDefaultGeometry();
                     Feature jsonFeature;
                     if (spatialObject.getUserData() != null) {
                         Map<String, Object> userData = new HashMap<String, Object>();
@@ -543,9 +545,9 @@ public class SpatialRDD<T extends Geometry>
     @Deprecated
     public RectangleRDD MinimumBoundingRectangle()
     {
-        JavaRDD<Polygon> rectangleRDD = this.rawSpatialRDD.map(new Function<T, Polygon>()
+        JavaRDD<PolygonFeature> rectangleRDD = this.rawSpatialRDD.map(new Function<T, PolygonFeature>()
         {
-            public Polygon call(T spatialObject)
+            public PolygonFeature call(T spatialObject)
             {
                 Double x1, x2, y1, y2;
                 LinearRing linear;
@@ -563,7 +565,7 @@ public class SpatialRDD<T extends Geometry>
                 coordinates[4] = coordinates[0];
                 linear = fact.createLinearRing(coordinates);
                 Polygon polygonObject = new Polygon(linear, null, fact);
-                return polygonObject;
+                return PolygonFeature.createFeature(spatialObject,polygonObject);
             }
         });
         return new RectangleRDD(rectangleRDD);

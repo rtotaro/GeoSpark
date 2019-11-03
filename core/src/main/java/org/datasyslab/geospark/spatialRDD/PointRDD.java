@@ -23,6 +23,7 @@ import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.formatMapper.FormatMapper;
 import org.datasyslab.geospark.formatMapper.PointFormatMapper;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 
@@ -33,7 +34,7 @@ import org.locationtech.jts.geom.Point;
  */
 
 public class PointRDD
-        extends SpatialRDD<Point>
+        extends SpatialRDD<PointFeature>
 {
 
     /**
@@ -46,7 +47,7 @@ public class PointRDD
      *
      * @param rawSpatialRDD the raw spatial RDD
      */
-    public PointRDD(JavaRDD<Point> rawSpatialRDD)
+    public PointRDD(JavaRDD<PointFeature> rawSpatialRDD)
     {
         this.rawSpatialRDD = rawSpatialRDD;
     }
@@ -58,7 +59,7 @@ public class PointRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public PointRDD(JavaRDD<Point> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
+    public PointRDD(JavaRDD<PointFeature> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -152,7 +153,7 @@ public class PointRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public PointRDD(JavaRDD<Point> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
+    public PointRDD(JavaRDD<PointFeature> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.boundaryEnvelope = datasetBoundary;
@@ -168,7 +169,7 @@ public class PointRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public PointRDD(JavaRDD<Point> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
+    public PointRDD(JavaRDD<PointFeature> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -287,7 +288,7 @@ public class PointRDD
      * @param rawSpatialRDD the raw spatial RDD
      * @param newLevel the new level
      */
-    public PointRDD(JavaRDD<Point> rawSpatialRDD, StorageLevel newLevel)
+    public PointRDD(JavaRDD<PointFeature> rawSpatialRDD, StorageLevel newLevel)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.analyze(newLevel);
@@ -390,7 +391,7 @@ public class PointRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public PointRDD(JavaRDD<Point> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+    public PointRDD(JavaRDD<PointFeature> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);

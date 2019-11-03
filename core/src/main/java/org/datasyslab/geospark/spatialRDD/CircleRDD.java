@@ -19,6 +19,10 @@ package org.datasyslab.geospark.spatialRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.datasyslab.geospark.geometryObjects.Circle;
+import org.datasyslab.geospark.simpleFeatureObjects.CircleFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -30,7 +34,7 @@ import org.locationtech.jts.geom.Polygon;
  * The Class CircleRDD.
  */
 public class CircleRDD
-        extends SpatialRDD<Circle>
+        extends SpatialRDD<CircleFeature>
 {
 
     /**
@@ -38,7 +42,7 @@ public class CircleRDD
      *
      * @param circleRDD the circle RDD
      */
-    public CircleRDD(JavaRDD<Circle> circleRDD)
+    public CircleRDD(JavaRDD<CircleFeature> circleRDD)
     {
         this.rawSpatialRDD = circleRDD;
     }
@@ -50,7 +54,7 @@ public class CircleRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCRSCode the target epsg CRS code
      */
-    public CircleRDD(JavaRDD<Circle> circleRDD, String sourceEpsgCRSCode, String targetEpsgCRSCode)
+    public CircleRDD(JavaRDD<CircleFeature> circleRDD, String sourceEpsgCRSCode, String targetEpsgCRSCode)
     {
         this.rawSpatialRDD = circleRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCRSCode);
@@ -86,12 +90,12 @@ public class CircleRDD
      */
     public PointRDD getCenterPointAsSpatialRDD()
     {
-        return new PointRDD(this.rawSpatialRDD.map(new Function<Circle, Point>()
+        return new PointRDD(this.rawSpatialRDD.map(new Function<CircleFeature, PointFeature>()
         {
 
-            public Point call(Circle circle)
+            public PointFeature call(CircleFeature circle)
             {
-                return (Point) circle.getCenterGeometry();
+                return PointFeature.createFeature(circle, (Point)circle.getDefaultGeometry().getCenterGeometry());
             }
         }));
     }
@@ -103,13 +107,12 @@ public class CircleRDD
      */
     public PolygonRDD getCenterPolygonAsSpatialRDD()
     {
-        return new PolygonRDD(this.rawSpatialRDD.map(new Function<Circle, Polygon>()
+        return new PolygonRDD(this.rawSpatialRDD.map(new Function<CircleFeature, PolygonFeature>()
         {
 
-            public Polygon call(Circle circle)
+            public PolygonFeature call(CircleFeature circle)
             {
-
-                return (Polygon) circle.getCenterGeometry();
+                return PolygonFeature.createFeature(circle,(Polygon) circle.getDefaultGeometry().getCenterGeometry());
             }
         }));
     }
@@ -121,13 +124,13 @@ public class CircleRDD
      */
     public LineStringRDD getCenterLineStringRDDAsSpatialRDD()
     {
-        return new LineStringRDD(this.rawSpatialRDD.map(new Function<Circle, LineString>()
+        return new LineStringRDD(this.rawSpatialRDD.map(new Function<CircleFeature, LineStringFeature>()
         {
 
-            public LineString call(Circle circle)
+            public LineStringFeature call(CircleFeature circle)
             {
 
-                return (LineString) circle.getCenterGeometry();
+                return LineStringFeature.createFeature(circle,(LineString) circle.getDefaultGeometry().getCenterGeometry());
             }
         }));
     }
@@ -139,13 +142,12 @@ public class CircleRDD
      */
     public RectangleRDD getCenterRectangleRDDAsSpatialRDD()
     {
-        return new RectangleRDD(this.rawSpatialRDD.map(new Function<Circle, Polygon>()
+        return new RectangleRDD(this.rawSpatialRDD.map(new Function<CircleFeature, PolygonFeature>()
         {
 
-            public Polygon call(Circle circle)
+            public PolygonFeature call(CircleFeature circle)
             {
-
-                return (Polygon) circle.getCenterGeometry();
+                return PolygonFeature.createFeature(circle,(Polygon) circle.getDefaultGeometry().getCenterGeometry());
             }
         }));
     }

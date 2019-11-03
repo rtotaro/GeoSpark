@@ -19,6 +19,8 @@ package org.datasyslab.geospark.spatialPartitioning;
 
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.utils.HalfOpenRectangle;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -47,7 +49,7 @@ public class KDBTreePartitioner
     }
 
     @Override
-    public <T extends Geometry> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
+    public <T extends GeometryFeature> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
             throws Exception
     {
 
@@ -57,12 +59,12 @@ public class KDBTreePartitioner
 
         final List<KDBTree> matchedPartitions = tree.findLeafNodes(envelope);
 
-        final Point point = spatialObject instanceof Point ? (Point) spatialObject : null;
+        final PointFeature point = spatialObject instanceof PointFeature ? (PointFeature) spatialObject : null;
 
         final Set<Tuple2<Integer, T>> result = new HashSet<>();
         for (KDBTree leaf : matchedPartitions) {
             // For points, make sure to return only one partition
-            if (point != null && !(new HalfOpenRectangle(leaf.getExtent())).contains(point)) {
+            if (point != null && !(new HalfOpenRectangle(leaf.getExtent())).contains(point.getDefaultGeometry())) {
                 continue;
             }
 

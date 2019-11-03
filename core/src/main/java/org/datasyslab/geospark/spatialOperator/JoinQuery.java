@@ -28,10 +28,14 @@ import org.datasyslab.geospark.geometryObjects.Circle;
 import org.datasyslab.geospark.joinJudgement.*;
 import org.datasyslab.geospark.monitoring.GeoSparkMetric;
 import org.datasyslab.geospark.monitoring.GeoSparkMetrics;
+import org.datasyslab.geospark.simpleFeatureObjects.CircleFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.datasyslab.geospark.spatialPartitioning.SpatialPartitioner;
 import org.datasyslab.geospark.spatialRDD.CircleRDD;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -43,7 +47,7 @@ public class JoinQuery
 {
     private static final Logger log = LoggerFactory.getLogger(JoinQuery.class);
 
-    private static <U extends Geometry, T extends Geometry> void verifyCRSMatch(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD)
+    private static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> void verifyCRSMatch(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD)
             throws Exception
     {
         // Check CRS information before doing calculation. The two input RDDs are supposed to have the same EPSG code if they require CRS transformation.
@@ -58,7 +62,7 @@ public class JoinQuery
         }
     }
 
-    private static <U extends Geometry, T extends Geometry> void verifyPartitioningMatch(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD)
+    private static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> void verifyPartitioningMatch(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD)
             throws Exception
     {
         Objects.requireNonNull(spatialRDD.spatialPartitionedRDD, "[JoinQuery] spatialRDD SpatialPartitionedRDD is null. Please do spatial partitioning.");
@@ -78,24 +82,24 @@ public class JoinQuery
         }
     }
 
-    private static <U extends Geometry, T extends Geometry> JavaPairRDD<U, HashSet<T>> collectGeometriesByKey(JavaPairRDD<U, T> input)
+    private static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, HashSet<GT>> collectGeometriesByKey(JavaPairRDD<GU, GT> input)
     {
         return input.aggregateByKey(
-                new HashSet<T>(),
-                new Function2<HashSet<T>, T, HashSet<T>>()
+                new HashSet<GT>(),
+                new Function2<HashSet<GT>, GT, HashSet<GT>>()
                 {
                     @Override
-                    public HashSet<T> call(HashSet<T> ts, T t)
+                    public HashSet<GT> call(HashSet<GT> ts, GT t)
                             throws Exception
                     {
                         ts.add(t);
                         return ts;
                     }
                 },
-                new Function2<HashSet<T>, HashSet<T>, HashSet<T>>()
+                new Function2<HashSet<GT>, HashSet<GT>, HashSet<GT>>()
                 {
                     @Override
-                    public HashSet<T> call(HashSet<T> ts, HashSet<T> ts2)
+                    public HashSet<GT> call(HashSet<GT> ts, HashSet<GT> ts2)
                             throws Exception
                     {
                         ts.addAll(ts2);
@@ -104,15 +108,15 @@ public class JoinQuery
                 });
     }
 
-    private static <U extends Geometry, T extends Geometry> JavaPairRDD<U, Long> countGeometriesByKey(JavaPairRDD<U, T> input)
+    private static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, Long> countGeometriesByKey(JavaPairRDD<GU, GT> input)
     {
         return input.aggregateByKey(
                 0L,
-                new Function2<Long, T, Long>()
+                new Function2<Long, GT, Long>()
                 {
 
                     @Override
-                    public Long call(Long count, T t)
+                    public Long call(Long count, GT t)
                             throws Exception
                     {
                         return count + 1;
@@ -180,18 +184,18 @@ public class JoinQuery
      * @return RDD of pairs where each pair contains a geometry and a set of matching geometries
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, HashSet<T>> SpatialJoinQuery(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, HashSet<GT>> SpatialJoinQuery(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, false);
-        final JavaPairRDD<U, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        final JavaPairRDD<GU, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, HashSet<T>> SpatialJoinQuery(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, JoinParams joinParams)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, HashSet<GT>> SpatialJoinQuery(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, JoinParams joinParams)
             throws Exception
     {
-        final JavaPairRDD<U, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        final JavaPairRDD<GU, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
@@ -207,18 +211,18 @@ public class JoinQuery
      * @return RDD of pairs where each pair contains a geometry and a set of matching geometries
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, HashSet<T>> SpatialJoinQueryWithDuplicates(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, HashSet<GT>> SpatialJoinQueryWithDuplicates(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, true);
-        final JavaPairRDD<U, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        final JavaPairRDD<GU, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, HashSet<T>> SpatialJoinQueryWithDuplicates(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, JoinParams joinParams)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, HashSet<GT>> SpatialJoinQueryWithDuplicates(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, JoinParams joinParams)
             throws Exception
     {
-        final JavaPairRDD<U, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        final JavaPairRDD<GU, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
@@ -244,14 +248,14 @@ public class JoinQuery
      * @return RDD of pairs of matching geometries
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, T> SpatialJoinQueryFlat(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, GT> SpatialJoinQueryFlat(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams params = new JoinParams(useIndex, considerBoundaryIntersection, false);
         return spatialJoin(queryRDD, spatialRDD, params);
     }
 
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, T> SpatialJoinQueryFlat(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, JoinParams joinParams)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, GT> SpatialJoinQueryFlat(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, JoinParams joinParams)
             throws Exception
     {
         return spatialJoin(queryRDD, spatialRDD, joinParams);
@@ -271,18 +275,18 @@ public class JoinQuery
      * @return the result of {@link #SpatialJoinQueryFlat(SpatialRDD, SpatialRDD, boolean, boolean)}, but in this pair RDD, each pair contains a geometry and the count of matching geometries
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, Long> SpatialJoinQueryCountByKey(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, Long> SpatialJoinQueryCountByKey(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, false);
-        final JavaPairRDD<U, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        final JavaPairRDD<GU, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
         return countGeometriesByKey(joinResults);
     }
 
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, Long> SpatialJoinQueryCountByKey(SpatialRDD<T> spatialRDD, SpatialRDD<U> queryRDD, JoinParams joinParams)
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, Long> SpatialJoinQueryCountByKey(SpatialRDD<GT> spatialRDD, SpatialRDD<GU> queryRDD, JoinParams joinParams)
             throws Exception
     {
-        final JavaPairRDD<U, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        final JavaPairRDD<GU, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
         return countGeometriesByKey(joinResults);
     }
 
@@ -307,14 +311,14 @@ public class JoinQuery
      * @return RDD of pairs of matching geometries
      * @throws Exception the exception
      */
-    public static <T extends Geometry> JavaPairRDD<Geometry, T> DistanceJoinQueryFlat(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, GT> DistanceJoinQueryFlat(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, false);
         return distanceJoin(spatialRDD, queryRDD, joinParams);
     }
 
-    public static <T extends Geometry> JavaPairRDD<Geometry, T> DistanceJoinQueryFlat(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, GT> DistanceJoinQueryFlat(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
             throws Exception
     {
         return distanceJoin(spatialRDD, queryRDD, joinParams);
@@ -344,18 +348,18 @@ public class JoinQuery
      * @return RDD of pairs where each pair contains a geometry and a set of matching geometries
      * @throws Exception the exception
      */
-    public static <T extends Geometry> JavaPairRDD<Geometry, HashSet<T>> DistanceJoinQuery(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, HashSet<GT>> DistanceJoinQuery(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, false);
-        JavaPairRDD<Geometry, T> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
+        JavaPairRDD<GeometryFeature, GT> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
-    public static <T extends Geometry> JavaPairRDD<Geometry, HashSet<T>> DistanceJoinQuery(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, HashSet<GT>> DistanceJoinQuery(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
             throws Exception
     {
-        JavaPairRDD<Geometry, T> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
+        JavaPairRDD<GeometryFeature, GT> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
@@ -370,18 +374,18 @@ public class JoinQuery
      * @return RDD of pairs where each pair contains a geometry and a set of matching geometries
      * @throws Exception the exception
      */
-    public static <T extends Geometry> JavaPairRDD<Geometry, HashSet<T>> DistanceJoinQueryWithDuplicates(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, HashSet<GT>> DistanceJoinQueryWithDuplicates(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, true);
-        JavaPairRDD<Geometry, T> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
+        JavaPairRDD<GeometryFeature, GT> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
-    public static <T extends Geometry> JavaPairRDD<Geometry, HashSet<T>> DistanceJoinQueryWithDuplicates(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, HashSet<GT>> DistanceJoinQueryWithDuplicates(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
             throws Exception
     {
-        JavaPairRDD<Geometry, T> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
+        JavaPairRDD<GeometryFeature, GT> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
         return collectGeometriesByKey(joinResults);
     }
 
@@ -398,18 +402,18 @@ public class JoinQuery
      * @return the result of {@link #DistanceJoinQueryFlat(SpatialRDD, CircleRDD, boolean, boolean)}, but in this pair RDD, each pair contains a geometry and the count of matching geometries
      * @throws Exception the exception
      */
-    public static <T extends Geometry> JavaPairRDD<Geometry, Long> DistanceJoinQueryCountByKey(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, Long> DistanceJoinQueryCountByKey(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, boolean useIndex, boolean considerBoundaryIntersection)
             throws Exception
     {
         final JoinParams joinParams = new JoinParams(useIndex, considerBoundaryIntersection, false);
-        final JavaPairRDD<Geometry, T> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
+        final JavaPairRDD<GeometryFeature, GT> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
         return countGeometriesByKey(joinResults);
     }
 
-    public static <T extends Geometry> JavaPairRDD<Geometry, Long> DistanceJoinQueryCountByKey(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, Long> DistanceJoinQueryCountByKey(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
             throws Exception
     {
-        final JavaPairRDD<Geometry, T> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
+        final JavaPairRDD<GeometryFeature, GT> joinResults = distanceJoin(spatialRDD, queryRDD, joinParams);
         return countGeometriesByKey(joinResults);
     }
 
@@ -418,17 +422,18 @@ public class JoinQuery
      * Note: INTERNAL FUNCTION. API COMPATIBILITY IS NOT GUARANTEED. DO NOT USE IF YOU DON'T KNOW WHAT IT IS.
      * </p>
      */
-    public static <T extends Geometry> JavaPairRDD<Geometry, T> distanceJoin(SpatialRDD<T> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
+    public static <T extends Geometry,GT extends GeometryFeature<T>> JavaPairRDD<GeometryFeature, GT> distanceJoin(SpatialRDD<GT> spatialRDD, CircleRDD queryRDD, JoinParams joinParams)
             throws Exception
     {
-        JavaPairRDD<Circle, T> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
-        return joinResults.mapToPair(new PairFunction<Tuple2<Circle, T>, Geometry, T>()
+        JavaPairRDD<CircleFeature, GT> joinResults = spatialJoin(queryRDD, spatialRDD, joinParams);
+        return joinResults.mapToPair(new PairFunction<Tuple2<CircleFeature, GT>, GeometryFeature, GT>()
         {
+
             @Override
-            public Tuple2<Geometry, T> call(Tuple2<Circle, T> circleTTuple2)
+            public Tuple2<GeometryFeature, GT> call(Tuple2<CircleFeature, GT> circleTTuple2)
                     throws Exception
             {
-                return new Tuple2<Geometry, T>((Geometry) circleTTuple2._1().getCenterGeometry(), circleTTuple2._2());
+                return new Tuple2<GeometryFeature, GT>(PolygonFeature.createFeature(circleTTuple2._1(), (Polygon) circleTTuple2._1().getDefaultGeometry().getCenterGeometry()), circleTTuple2._2());
             }
         });
     }
@@ -438,9 +443,9 @@ public class JoinQuery
      * Note: INTERNAL FUNCTION. API COMPATIBILITY IS NOT GUARANTEED. DO NOT USE IF YOU DON'T KNOW WHAT IT IS.
      * </p>
      */
-    public static <U extends Geometry, T extends Geometry> JavaPairRDD<U, T> spatialJoin(
-            SpatialRDD<U> leftRDD,
-            SpatialRDD<T> rightRDD,
+    public static <U extends Geometry, T extends Geometry,GU extends GeometryFeature<U>,GT extends GeometryFeature<T>> JavaPairRDD<GU, GT> spatialJoin(
+            SpatialRDD<GU> leftRDD,
+            SpatialRDD<GT> rightRDD,
             JoinParams joinParams)
             throws Exception
     {
@@ -458,7 +463,7 @@ public class JoinQuery
                 (SpatialPartitioner) rightRDD.spatialPartitionedRDD.partitioner().get();
         final DedupParams dedupParams = partitioner.getDedupParams();
 
-        final JavaRDD<Pair<U, T>> resultWithDuplicates;
+        final JavaRDD<Pair<GU, GT>> resultWithDuplicates;
         if (joinParams.useIndex) {
             if (rightRDD.indexedRDD != null) {
                 final RightIndexLookupJudgement judgement =
@@ -499,14 +504,14 @@ public class JoinQuery
 
         final boolean uniqueResults = dedupParams != null;
 
-        final JavaRDD<Pair<U, T>> result =
+        final JavaRDD<Pair<GU, GT>> result =
                 (joinParams.allowDuplicates || uniqueResults) ? resultWithDuplicates
                         : resultWithDuplicates.distinct();
 
-        return result.mapToPair(new PairFunction<Pair<U, T>, U, T>()
+        return result.mapToPair(new PairFunction<Pair<GU, GT>, GU, GT>()
         {
             @Override
-            public Tuple2<U, T> call(Pair<U, T> pair)
+            public Tuple2<GU, GT> call(Pair<GU, GT> pair)
                     throws Exception
             {
                 return new Tuple2<>(pair.getKey(), pair.getValue());

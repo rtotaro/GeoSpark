@@ -29,6 +29,7 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.TypeU
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.locationtech.jts.geom.*;
 import scala.Tuple2;
 
@@ -134,7 +135,7 @@ public class ShapefileRDD
      *
      * @return the point RDD
      */
-    public JavaRDD<Point> getPointRDD()
+    public JavaRDD<PointFeature> getPointRDD()
     {
         return shapeRDD.flatMap(new FlatMapFunction<Geometry, Point>()
         {

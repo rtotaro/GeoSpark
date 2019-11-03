@@ -23,6 +23,7 @@ import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.formatMapper.FormatMapper;
 import org.datasyslab.geospark.formatMapper.LineStringFormatMapper;
+import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 
@@ -32,7 +33,7 @@ import org.locationtech.jts.geom.LineString;
  * The Class LineStringRDD.
  */
 public class LineStringRDD
-        extends SpatialRDD<LineString>
+        extends SpatialRDD<LineStringFeature>
 {
     /**
      * Instantiates a new line string RDD.
@@ -45,7 +46,7 @@ public class LineStringRDD
      *
      * @param rawSpatialRDD the raw spatial RDD
      */
-    public LineStringRDD(JavaRDD<LineString> rawSpatialRDD)
+    public LineStringRDD(JavaRDD<LineStringFeature> rawSpatialRDD)
     {
         this.rawSpatialRDD = rawSpatialRDD;
     }
@@ -57,7 +58,7 @@ public class LineStringRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public LineStringRDD(JavaRDD<LineString> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
+    public LineStringRDD(JavaRDD<LineStringFeature> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -153,7 +154,7 @@ public class LineStringRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public LineStringRDD(JavaRDD<LineString> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
+    public LineStringRDD(JavaRDD<LineStringFeature> rawSpatialRDD, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.boundaryEnvelope = datasetBoundary;
@@ -169,7 +170,7 @@ public class LineStringRDD
      * @param datasetBoundary the dataset boundary
      * @param approximateTotalCount the approximate total count
      */
-    public LineStringRDD(JavaRDD<LineString> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
+    public LineStringRDD(JavaRDD<LineStringFeature> rawSpatialRDD, String sourceEpsgCRSCode, String targetEpsgCode, Envelope datasetBoundary, Integer approximateTotalCount)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);
@@ -290,7 +291,7 @@ public class LineStringRDD
      * @param rawSpatialRDD the raw spatial RDD
      * @param newLevel the new level
      */
-    public LineStringRDD(JavaRDD<LineString> rawSpatialRDD, StorageLevel newLevel)
+    public LineStringRDD(JavaRDD<LineStringFeature> rawSpatialRDD, StorageLevel newLevel)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.analyze(newLevel);
@@ -398,7 +399,7 @@ public class LineStringRDD
      * @param sourceEpsgCRSCode the source epsg CRS code
      * @param targetEpsgCode the target epsg code
      */
-    public LineStringRDD(JavaRDD<LineString> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
+    public LineStringRDD(JavaRDD<LineStringFeature> rawSpatialRDD, StorageLevel newLevel, String sourceEpsgCRSCode, String targetEpsgCode)
     {
         this.rawSpatialRDD = rawSpatialRDD;
         this.CRSTransform(sourceEpsgCRSCode, targetEpsgCode);

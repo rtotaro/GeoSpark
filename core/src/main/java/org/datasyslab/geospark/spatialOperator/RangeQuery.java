@@ -19,6 +19,7 @@ package org.datasyslab.geospark.spatialOperator;
 import org.apache.spark.api.java.JavaRDD;
 import org.datasyslab.geospark.rangeJudgement.RangeFilter;
 import org.datasyslab.geospark.rangeJudgement.RangeFilterUsingIndex;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.datasyslab.geospark.utils.CRSTransformation;
 import org.locationtech.jts.geom.Coordinate;
@@ -47,7 +48,7 @@ public class RangeQuery
      * @return the java RDD
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaRDD<T> SpatialRangeQuery(SpatialRDD<T> spatialRDD, U originalQueryGeometry, boolean considerBoundaryIntersection, boolean useIndex)
+    public static <U extends Geometry, T extends Geometry> JavaRDD<? extends GeometryFeature<T>> SpatialRangeQuery(SpatialRDD<? extends GeometryFeature<T>> spatialRDD, U originalQueryGeometry, boolean considerBoundaryIntersection, boolean useIndex)
             throws Exception
     {
         U queryGeometry = originalQueryGeometry;
@@ -76,7 +77,7 @@ public class RangeQuery
      * @return the java RDD
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaRDD<T> SpatialRangeQuery(SpatialRDD<T> spatialRDD, Envelope queryWindow, boolean considerBoundaryIntersection, boolean useIndex)
+    public static <U extends Geometry, T extends Geometry> JavaRDD<? extends GeometryFeature<T>> SpatialRangeQuery(SpatialRDD<? extends GeometryFeature<T>> spatialRDD, Envelope queryWindow, boolean considerBoundaryIntersection, boolean useIndex)
             throws Exception
     {
         Coordinate[] coordinates = new Coordinate[5];
@@ -100,7 +101,7 @@ public class RangeQuery
      * @return the java RDD
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaRDD<T> SpatialRangeQuery(Envelope queryWindow, SpatialRDD<T> spatialRDD, boolean considerBoundaryIntersection, boolean useIndex)
+    public static <U extends Geometry, T extends Geometry> JavaRDD<? extends GeometryFeature<T>> SpatialRangeQuery(Envelope queryWindow, SpatialRDD<? extends GeometryFeature<T>> spatialRDD, boolean considerBoundaryIntersection, boolean useIndex)
             throws Exception
     {
         Coordinate[] coordinates = new Coordinate[5];
@@ -124,7 +125,7 @@ public class RangeQuery
      * @return the java RDD
      * @throws Exception the exception
      */
-    public static <U extends Geometry, T extends Geometry> JavaRDD<T> SpatialRangeQuery(U originalQueryGeometry, SpatialRDD<T> spatialRDD, boolean considerBoundaryIntersection, boolean useIndex)
+    public static <U extends Geometry, T extends Geometry> JavaRDD<? extends GeometryFeature<T>> SpatialRangeQuery(U originalQueryGeometry, SpatialRDD<? extends GeometryFeature<T>> spatialRDD, boolean considerBoundaryIntersection, boolean useIndex)
             throws Exception
     {
         U queryGeometry = originalQueryGeometry;

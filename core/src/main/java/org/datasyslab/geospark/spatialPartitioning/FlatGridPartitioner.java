@@ -18,6 +18,7 @@ package org.datasyslab.geospark.spatialPartitioning;
 
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import scala.Tuple2;
@@ -40,7 +41,7 @@ public class FlatGridPartitioner
     }
 
     @Override
-    public <T extends Geometry> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
+    public <T extends GeometryFeature> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
             throws Exception
     {
         Objects.requireNonNull(spatialObject, "spatialObject");
