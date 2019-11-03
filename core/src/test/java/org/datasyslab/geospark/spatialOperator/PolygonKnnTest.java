@@ -228,7 +228,7 @@ public class PolygonKnnTest
         List<PolygonFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, false);
         polygonRDD.buildIndex(IndexType.RTREE, false);
         List<PolygonFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, true);
-        GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
+        GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint.getDefaultGeometry(), true);
 
         List<PolygonFeature> mResultNoIndex = new ArrayList<>(resultNoIndex);
         List<PolygonFeature> mResultWithIndex = new ArrayList<>(resultNoIndex);

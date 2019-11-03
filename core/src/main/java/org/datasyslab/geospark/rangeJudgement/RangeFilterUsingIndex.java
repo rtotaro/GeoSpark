@@ -17,6 +17,7 @@
 package org.datasyslab.geospark.rangeJudgement;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
 
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class RangeFilterUsingIndex<U extends Geometry, T extends Geometry>
         extends JudgementBase
-        implements FlatMapFunction<Iterator<SpatialIndex>, T>
+        implements FlatMapFunction<Iterator<SpatialIndex>, GeometryFeature<T>>
 {
 
     public RangeFilterUsingIndex(U queryWindow, boolean considerBoundaryIntersection, boolean leftCoveredByRight)
@@ -47,21 +48,21 @@ public class RangeFilterUsingIndex<U extends Geometry, T extends Geometry>
      * @see org.apache.spark.api.java.function.FlatMapFunction#call(java.lang.Object)
      */
     @Override
-    public Iterator<T> call(Iterator<SpatialIndex> treeIndexes)
+    public Iterator<GeometryFeature<T>> call(Iterator<SpatialIndex> treeIndexes)
             throws Exception
     {
         assert treeIndexes.hasNext() == true;
         SpatialIndex treeIndex = treeIndexes.next();
-        List<T> results = new ArrayList<T>();
-        List<T> tempResults = treeIndex.query(this.queryGeometry.getEnvelopeInternal());
-        for (T tempResult : tempResults) {
+        List<GeometryFeature<T>> results = new ArrayList<GeometryFeature<T>>();
+        List<GeometryFeature<T>> tempResults = treeIndex.query(this.queryGeometry.getEnvelopeInternal());
+        for (GeometryFeature<T> tempResult : tempResults) {
             if (leftCoveredByRight) {
-                if (match(tempResult, queryGeometry)) {
+                if (match(tempResult.getDefaultGeometry(), queryGeometry)) {
                     results.add(tempResult);
                 }
             }
             else {
-                if (match(queryGeometry, tempResult)) {
+                if (match(queryGeometry, tempResult.getDefaultGeometry())) {
                     results.add(tempResult);
                 }
             }

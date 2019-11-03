@@ -21,7 +21,10 @@ import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.GeometryItemDistance;
+import org.locationtech.jts.index.strtree.ItemBoundable;
+import org.locationtech.jts.index.strtree.ItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.opengis.feature.simple.SimpleFeature;
 import scala.Tuple3;
 
 import java.io.Serializable;
@@ -34,7 +37,7 @@ import java.util.List;
 /**
  * The Class KnnJudgementUsingIndex.
  */
-public class KnnJudgementUsingIndex<U extends GeometryFeature, T extends GeometryFeature>
+public class KnnJudgementUsingIndex<U extends Geometry, T extends GeometryFeature>
         implements FlatMapFunction<Iterator<SpatialIndex>, T>, Serializable
 {
 
@@ -46,7 +49,10 @@ public class KnnJudgementUsingIndex<U extends GeometryFeature, T extends Geometr
     /**
      * The query center.
      */
-    transient U queryCenter;
+    U queryCenter;
+
+
+    String featureId;
 
     /**
      * Instantiates a new knn judgement using index.
@@ -54,9 +60,10 @@ public class KnnJudgementUsingIndex<U extends GeometryFeature, T extends Geometr
      * @param queryCenter the query center
      * @param k the k
      */
-    public KnnJudgementUsingIndex(U queryCenter, int k)
+    public KnnJudgementUsingIndex(U queryCenter,String featureId, int k)
     {
         this.queryCenter = queryCenter;
+        this.featureId=featureId;
         this.k = k;
     }
 
@@ -70,7 +77,14 @@ public class KnnJudgementUsingIndex<U extends GeometryFeature, T extends Geometr
         SpatialIndex treeIndex = treeIndexes.next();
         final Object[] localK;
         if (treeIndex instanceof STRtree) {
-            localK = ((STRtree) treeIndex).nearestNeighbour(queryCenter.getEnvelopeInternal(), queryCenter, new GeometryItemDistance(), k);
+            localK = ((STRtree) treeIndex).nearestNeighbour(queryCenter.getEnvelopeInternal(), GeometryFeature.createGeometryFeature(queryCenter, featureId), new ItemDistance() {
+                @Override
+                public double distance(ItemBoundable item1, ItemBoundable item2) {
+                    GeometryFeature f1 = (GeometryFeature) item1.getItem();
+                    GeometryFeature f2 = (GeometryFeature) item2.getItem();
+                    return f1.getDefaultGeometry().distance(f2.getDefaultGeometry());
+                }
+            }, k);
         }
         else {
             throw new Exception("[KnnJudgementUsingIndex][Call] QuadTree index doesn't support KNN search.");

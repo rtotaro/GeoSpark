@@ -222,7 +222,7 @@ public class PointKnnTest
         List<PointFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
         pointRDD.buildIndex(IndexType.RTREE, false);
         List<PointFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
-        GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
+        GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint.getDefaultGeometry(), true);
         List<PointFeature> mResultNoIndex = new ArrayList<>(resultNoIndex);
         List<PointFeature> mResultWithIndex = new ArrayList<>(resultNoIndex);
         Collections.sort(mResultNoIndex, geometryDistanceComparator);

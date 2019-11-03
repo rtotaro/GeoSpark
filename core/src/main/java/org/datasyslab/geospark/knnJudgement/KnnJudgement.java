@@ -30,7 +30,7 @@ import java.util.PriorityQueue;
 /**
  * The Class GeometryKnnJudgement.
  */
-public class KnnJudgement<U extends GeometryFeature, T extends GeometryFeature>
+public class KnnJudgement<U extends Geometry, T extends GeometryFeature>
         implements FlatMapFunction<Iterator<T>, T>, Serializable
 {
 
@@ -70,8 +70,8 @@ public class KnnJudgement<U extends GeometryFeature, T extends GeometryFeature>
             }
             else {
                 T curpoint = input.next();
-                double distance = curpoint.getDefaultGeometry().distance(queryCenter.getDefaultGeometry());
-                double largestDistanceInPriQueue = pq.peek().getDefaultGeometry().distance(queryCenter.getDefaultGeometry());
+                double distance = curpoint.getDefaultGeometry().distance(queryCenter);
+                double largestDistanceInPriQueue = pq.peek().getDefaultGeometry().distance(queryCenter);
                 if (largestDistanceInPriQueue > distance) {
                     pq.poll();
                     pq.offer(curpoint);

@@ -27,8 +27,8 @@ import java.util.Comparator;
 /**
  * The Class GeometryDistanceComparator.
  */
-public class GeometryDistanceComparator<T extends GeometryFeature>
-        implements Comparator<T>, Serializable
+public class GeometryDistanceComparator<T extends Geometry>
+        implements Comparator<GeometryFeature<T>>, Serializable
 {
 
     /**
@@ -56,10 +56,10 @@ public class GeometryDistanceComparator<T extends GeometryFeature>
     /* (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(T p1, T p2)
+    public int compare(GeometryFeature<T> p1, GeometryFeature<T> p2)
     {
-        double distance1 = (p1.getDefaultGeometry()).distance(queryCenter.getDefaultGeometry());
-        double distance2 = (p2.getDefaultGeometry()).distance(queryCenter.getDefaultGeometry());
+        double distance1 = (p1.getDefaultGeometry()).distance(queryCenter);
+        double distance2 = (p2.getDefaultGeometry()).distance(queryCenter);
         if (this.normalOrder) {
             if (distance1 > distance2) {
                 return 1;

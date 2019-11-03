@@ -19,11 +19,9 @@ public class PointFeature extends GeometryFeature<Point> {
         return new PointFeature(feature);
     }
 
-    public static PointFeature createFeature(SimpleFeature feature)
-    {
+    public static PointFeature createFeature(SimpleFeature feature) {
         Object defaultGeometry = feature.getDefaultGeometry();
-        if(defaultGeometry instanceof Point)
-        {
+        if (defaultGeometry instanceof Point) {
             feature.setDefaultGeometry(defaultGeometry);
             return new PointFeature(feature);
         }
@@ -31,15 +29,5 @@ public class PointFeature extends GeometryFeature<Point> {
         throw new IllegalArgumentException("default geometry in feature is not a point");
 
     }
-
-//    //Setters and Getters
-//
-//    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-//
-//    }
-//
-//    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
-//
-//    }
 
 }

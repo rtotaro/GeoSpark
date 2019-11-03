@@ -19,10 +19,7 @@ package org.datasyslab.geospark.spatialRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.datasyslab.geospark.geometryObjects.Circle;
-import org.datasyslab.geospark.simpleFeatureObjects.CircleFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.*;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -69,13 +66,13 @@ public class CircleRDD
     public CircleRDD(SpatialRDD spatialRDD, Double Radius)
     {
         final Double radius = Radius;
-        this.rawSpatialRDD = spatialRDD.rawSpatialRDD.map(new Function<Object, Object>()
+        this.rawSpatialRDD = spatialRDD.rawSpatialRDD.map(new Function<GeometryFeature, CircleFeature>()
         {
 
-            public Object call(Object v1)
+            public CircleFeature call(GeometryFeature v1)
             {
 
-                return new Circle((Geometry) v1, radius);
+                return (CircleFeature) GeometryFeature.createGeometryFeature(new Circle( v1.getDefaultGeometry(), radius));
             }
         });
         this.CRStransformation = spatialRDD.CRStransformation;

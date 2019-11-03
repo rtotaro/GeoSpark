@@ -228,7 +228,7 @@ public class RectangleKnnTest
         List<PolygonFeature> resultNoIndexModifiable = new ArrayList<PolygonFeature>(resultNoIndex);
         List<PolygonFeature> resultWithIndexModifiable = new ArrayList<PolygonFeature>(resultWithIndex);
 
-        GeometryDistanceComparator rectangleDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
+        GeometryDistanceComparator rectangleDistanceComparator = new GeometryDistanceComparator(this.queryPoint.getDefaultGeometry(), true);
         Collections.sort(resultNoIndexModifiable, rectangleDistanceComparator);
         Collections.sort(resultWithIndexModifiable, rectangleDistanceComparator);
         int difference = 0;

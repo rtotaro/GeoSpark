@@ -58,14 +58,14 @@ public class KNNQuery
             if (spatialRDD.indexedRawRDD == null) {
                 throw new NullPointerException("Need to invoke buildIndex() first, indexedRDDNoId is null");
             }
-            JavaRDD<T> tmp = spatialRDD.indexedRawRDD.mapPartitions(new KnnJudgementUsingIndex(queryCenter, k));
-            List<T> result = tmp.takeOrdered(k, new GeometryDistanceComparator(queryCenter, true));
+            JavaRDD<T> tmp = spatialRDD.indexedRawRDD.mapPartitions(new KnnJudgementUsingIndex(queryCenter.getDefaultGeometry(),queryCenter.getIdentifier().getID(), k));
+            List<T> result = tmp.takeOrdered(k, new GeometryDistanceComparator(queryCenter.getDefaultGeometry(), true));
             // Take the top k
             return result;
         }
         else {
-            JavaRDD<T> tmp = spatialRDD.getRawSpatialRDD().mapPartitions(new KnnJudgement(queryCenter, k));
-            List<T> result = tmp.takeOrdered(k, new GeometryDistanceComparator(queryCenter, true));
+            JavaRDD<T> tmp = spatialRDD.getRawSpatialRDD().mapPartitions(new KnnJudgement(queryCenter.getDefaultGeometry(), k));
+            List<T> result = tmp.takeOrdered(k, new GeometryDistanceComparator(queryCenter.getDefaultGeometry(), true));
             // Take the top k
             return result;
         }

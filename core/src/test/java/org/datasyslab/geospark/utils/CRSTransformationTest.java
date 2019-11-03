@@ -290,7 +290,7 @@ public class CRSTransformationTest
         List<PointFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
         pointRDD.buildIndex(IndexType.RTREE, false);
         List<PointFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
-        GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
+        GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint.getDefaultGeometry(), true);
         List<PointFeature> resultNoIndexModifiable = new ArrayList<>(resultNoIndex);
         List<PointFeature> resultWithIndexModifiable = new ArrayList<>(resultWithIndex);
         Collections.sort(resultNoIndexModifiable, geometryDistanceComparator);

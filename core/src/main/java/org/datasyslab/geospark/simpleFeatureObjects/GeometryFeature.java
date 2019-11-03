@@ -119,20 +119,25 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
     }
 
     public static GeometryFeature createGeometryFeature(Geometry geom) {
+        return createGeometryFeature(geom,UUID.randomUUID().toString());
+    }
+
+    public static GeometryFeature createGeometryFeature(Geometry geom,String featureId) {
+        SimpleFeature simpleFeature = createSimpleFeature(geom, featureId);
         if (geom instanceof Point) {
             Point point = (Point) geom;
-            return PointFeature.createFeature(createSimpleFeature(geom));
+            return PointFeature.createFeature(simpleFeature);
         }else if (geom instanceof Polygon) {
             Polygon polygon = (Polygon) geom;
-            return PolygonFeature.createFeature(createSimpleFeature(geom));
+            return PolygonFeature.createFeature(simpleFeature);
 
         }else if (geom instanceof LineString) {
             LineString lineS = (LineString) geom;
-            return LineStringFeature.createFeature(createSimpleFeature(geom));
+            return LineStringFeature.createFeature(simpleFeature);
 
         }else if (geom instanceof Circle) {
             Circle circle = (Circle) geom;
-            return CircleFeature.createFeature(createSimpleFeature(geom));
+            return CircleFeature.createFeature(simpleFeature);
 
         }else {
             throw new IllegalArgumentException("Unsupported geometry:"+geom.getClass().toString());
@@ -141,19 +146,29 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
     }
 
 
-    private static SimpleFeature createSimpleFeature(Geometry geometry) {
+    private static SimpleFeature createSimpleFeature(Geometry geometry,String id) {
 
-        SimpleFeature simpleFeature = SimpleFeatureBuilder.build(geometryFeatureType, Arrays.asList(geometry.toText(),geometry), UUID.randomUUID().toString());
+        String wkt = null;
+        if(geometry instanceof Circle)
+        {
+            Circle circle = (Circle)geometry;
+            Point point = circle.getCentroid();
+            wkt  = point.buffer(circle.getRadius()).toText();
+        }
+        else
+        {
+            wkt = geometry.toText();
+        }
+
+        SimpleFeature simpleFeature = SimpleFeatureBuilder.build(geometryFeatureType, Arrays.asList(wkt,geometry), UUID.randomUUID().toString());
         return simpleFeature;
     }
 
-//    //Setters and Getters
-//
-//    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-//    }
-//
-//    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
-//    }
+    private static SimpleFeature createSimpleFeature(Geometry geometry) {
+
+        return createSimpleFeature(geometry,UUID.randomUUID().toString());
+    }
+
 
 
 }
