@@ -20,8 +20,8 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.{Input, Output}
-import com.vividsolutions.jts.index.SpatialIndex
 import org.apache.spark.sql.catalyst.util.ArrayData
+import org.locationtech.jts.index.SpatialIndex
 
 // This is a wrapper of GeoSpark core kryo serializer
 object IndexSerializer {

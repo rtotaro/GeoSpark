@@ -26,7 +26,7 @@
 
 package org.datasyslab.geosparksql
 
-import com.vividsolutions.jts.geom.Geometry
+import org.locationtech.jts.geom.Geometry
 import org.datasyslab.geospark.enums.{FileDataSplitter, GridType, IndexType}
 import org.datasyslab.geospark.formatMapper.GeoJsonReader
 import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileReader
@@ -104,8 +104,9 @@ class adapterTestScala extends TestBaseScala {
       spatialDf.printSchema()
       var spatialRDD = Adapter.toSpatialRdd(spatialDf, "usacounty")
       spatialRDD.analyze()
-      assert(Adapter.toDf(spatialRDD, sparkSession).columns.length==3)
-      Adapter.toDf(spatialRDD, sparkSession).show()
+      val dataFrame = Adapter.toDf(spatialRDD, sparkSession)
+      assert(dataFrame.columns.length==3)
+      dataFrame.show()
     }
 
     it("Read shapefile -> DataFrame") {

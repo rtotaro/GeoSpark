@@ -16,7 +16,7 @@
  */
 package org.apache.spark.sql.geosparksql.expressions
 
-import com.vividsolutions.jts.geom.{Coordinate, Geometry, GeometryFactory}
+import org.locationtech.jts.geom.{Coordinate, Geometry, GeometryFactory}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
 import org.apache.spark.sql.geosparksql.UDT.GeometryUDT

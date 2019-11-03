@@ -19,6 +19,7 @@ package org.apache.spark.sql.geosparksql.UDT
 import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
 import org.apache.spark.sql.types._
 import org.datasyslab.geosparksql.utils.GeometrySerializer
+import org.locationtech.jts.geom.Geometry
 
 
 private[sql] class GeometryUDT extends UserDefinedType[Geometry] {

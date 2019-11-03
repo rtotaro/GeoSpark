@@ -10,7 +10,7 @@
     <description>Apache Spark geospatial extention: SpatialRDD, SpatialSQL and map visualization</description>
   <modules>
     <module>core</module>
-<!--    <module>sql</module>    -->
+    <module>sql</module>
 <!--    <module>viz</module>-->
   </modules>
 

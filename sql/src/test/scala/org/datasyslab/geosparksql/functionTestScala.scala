@@ -26,7 +26,7 @@
 
 package org.datasyslab.geosparksql
 
-import com.vividsolutions.jts.geom.Geometry
+import org.locationtech.jts.geom.Geometry
 
 class functionTestScala extends TestBaseScala {
 
