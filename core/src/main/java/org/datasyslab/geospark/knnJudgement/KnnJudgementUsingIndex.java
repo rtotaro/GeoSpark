@@ -17,10 +17,12 @@
 package org.datasyslab.geospark.knnJudgement;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.GeometryItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
+import scala.Tuple3;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ import java.util.List;
 /**
  * The Class KnnJudgementUsingIndex.
  */
-public class KnnJudgementUsingIndex<U extends Geometry, T extends Geometry>
+public class KnnJudgementUsingIndex<U extends GeometryFeature, T extends GeometryFeature>
         implements FlatMapFunction<Iterator<SpatialIndex>, T>, Serializable
 {
 
@@ -44,7 +46,7 @@ public class KnnJudgementUsingIndex<U extends Geometry, T extends Geometry>
     /**
      * The query center.
      */
-    U queryCenter;
+    transient U queryCenter;
 
     /**
      * Instantiates a new knn judgement using index.

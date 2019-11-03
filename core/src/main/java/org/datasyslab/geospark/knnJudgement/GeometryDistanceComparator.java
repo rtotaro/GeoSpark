@@ -16,6 +16,7 @@
  */
 package org.datasyslab.geospark.knnJudgement;
 
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
@@ -26,7 +27,7 @@ import java.util.Comparator;
 /**
  * The Class GeometryDistanceComparator.
  */
-public class GeometryDistanceComparator<T extends Geometry>
+public class GeometryDistanceComparator<T extends GeometryFeature>
         implements Comparator<T>, Serializable
 {
 
@@ -57,8 +58,8 @@ public class GeometryDistanceComparator<T extends Geometry>
      */
     public int compare(T p1, T p2)
     {
-        double distance1 = (p1).distance(queryCenter);
-        double distance2 = (p2).distance(queryCenter);
+        double distance1 = (p1.getDefaultGeometry()).distance(queryCenter.getDefaultGeometry());
+        double distance2 = (p2.getDefaultGeometry()).distance(queryCenter.getDefaultGeometry());
         if (this.normalOrder) {
             if (distance1 > distance2) {
                 return 1;

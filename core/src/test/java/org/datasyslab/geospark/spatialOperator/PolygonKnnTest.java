@@ -29,6 +29,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -108,7 +111,7 @@ public class PolygonKnnTest
     /**
      * The query point.
      */
-    static Point queryPoint;
+    static PointFeature queryPoint;
 
     /**
      * The top K.
@@ -161,7 +164,7 @@ public class PolygonKnnTest
                 }
             }
         }
-        queryPoint = fact.createPoint(new Coordinate(-84.01, 34.01));
+        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(-84.01, 34.01)));
         topK = 100;
     }
 
@@ -186,7 +189,7 @@ public class PolygonKnnTest
         PolygonRDD polygonRDD = new PolygonRDD(sc, InputLocation, splitter, true);
 
         for (int i = 0; i < loopTimes; i++) {
-            List<Polygon> result = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, false);
+            List<PolygonFeature> result = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, false);
             assert result.size() > -1;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -205,7 +208,7 @@ public class PolygonKnnTest
         PolygonRDD polygonRDD = new PolygonRDD(sc, InputLocation, splitter, true);
         polygonRDD.buildIndex(IndexType.RTREE, false);
         for (int i = 0; i < loopTimes; i++) {
-            List<Polygon> result = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, true);
+            List<PolygonFeature> result = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, true);
             assert result.size() > -1;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -222,13 +225,13 @@ public class PolygonKnnTest
             throws Exception
     {
         PolygonRDD polygonRDD = new PolygonRDD(sc, InputLocation, splitter, true);
-        List<Polygon> resultNoIndex = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, false);
+        List<PolygonFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, false);
         polygonRDD.buildIndex(IndexType.RTREE, false);
-        List<Polygon> resultWithIndex = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, true);
+        List<PolygonFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(polygonRDD, queryPoint, topK, true);
         GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
 
-        List<Polygon> mResultNoIndex = new ArrayList<>(resultNoIndex);
-        List<Polygon> mResultWithIndex = new ArrayList<>(resultNoIndex);
+        List<PolygonFeature> mResultNoIndex = new ArrayList<>(resultNoIndex);
+        List<PolygonFeature> mResultWithIndex = new ArrayList<>(resultNoIndex);
 
         Collections.sort(mResultNoIndex, geometryDistanceComparator);
         Collections.sort(mResultWithIndex, geometryDistanceComparator);

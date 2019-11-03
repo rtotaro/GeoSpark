@@ -29,6 +29,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -103,7 +105,7 @@ public class PointKnnTest
     /**
      * The query point.
      */
-    static Point queryPoint;
+    static PointFeature queryPoint;
 
     /**
      * The top K.
@@ -156,7 +158,7 @@ public class PointKnnTest
                 }
             }
         }
-        queryPoint = fact.createPoint(new Coordinate(-84.01, 34.01));
+        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(-84.01, 34.01)));
         topK = 100;
     }
 
@@ -181,7 +183,7 @@ public class PointKnnTest
         PointRDD pointRDD = new PointRDD(sc, InputLocation, offset, splitter, false);
 
         for (int i = 0; i < loopTimes; i++) {
-            List<Point> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
+            List<PointFeature> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
             assert result.size() > -1;
 //            assert result.get(0).getUserData().toString() != null; //TODO:check now userdata is null instead an empty string
             //System.out.println(result.get(0).getUserData().toString());
@@ -200,7 +202,7 @@ public class PointKnnTest
         PointRDD pointRDD = new PointRDD(sc, InputLocation, offset, splitter, false);
         pointRDD.buildIndex(IndexType.RTREE, false);
         for (int i = 0; i < loopTimes; i++) {
-            List<Point> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
+            List<PointFeature> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
             assert result.size() > -1;
 //            assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -217,12 +219,12 @@ public class PointKnnTest
             throws Exception
     {
         PointRDD pointRDD = new PointRDD(sc, InputLocation, offset, splitter, false);
-        List<Point> resultNoIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
+        List<PointFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
         pointRDD.buildIndex(IndexType.RTREE, false);
-        List<Point> resultWithIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
+        List<PointFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
         GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
-        List<Point> mResultNoIndex = new ArrayList<>(resultNoIndex);
-        List<Point> mResultWithIndex = new ArrayList<>(resultNoIndex);
+        List<PointFeature> mResultNoIndex = new ArrayList<>(resultNoIndex);
+        List<PointFeature> mResultWithIndex = new ArrayList<>(resultNoIndex);
         Collections.sort(mResultNoIndex, geometryDistanceComparator);
         Collections.sort(mResultWithIndex, geometryDistanceComparator);
         int difference = 0;

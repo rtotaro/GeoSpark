@@ -19,6 +19,7 @@ package org.datasyslab.geospark.formatMapper;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.datasyslab.geospark.enums.FileDataSplitter;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.locationtech.jts.geom.Geometry;
 
@@ -33,7 +34,7 @@ public class WktReader extends RddReader
      * @param skipSyntacticallyInvalidGeometries whether allows GeoSpark to automatically skip syntax-invalid geometries, rather than throw errors
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath, int wktColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath, int wktColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         JavaRDD rawTextRDD = sc.textFile(inputPath);
         FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(wktColumn, -1, FileDataSplitter.WKT, true, null);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
@@ -49,7 +50,7 @@ public class WktReader extends RddReader
      * @param skipSyntacticallyInvalidGeometries whether allows GeoSpark to automatically skip syntax-invalid geometries, rather than throw errors
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaRDD rawTextRDD, int wktColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaRDD rawTextRDD, int wktColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(wktColumn, -1, FileDataSplitter.WKT, true, null);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;

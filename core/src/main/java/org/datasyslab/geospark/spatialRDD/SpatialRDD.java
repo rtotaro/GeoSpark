@@ -474,13 +474,13 @@ public class SpatialRDD<T extends GeometryFeature>
                     }
                 };
 
-        final Function2 seqOp = new Function2<StatCalculator, Geometry, StatCalculator>()
+        final Function2 seqOp = new Function2<StatCalculator, GeometryFeature, StatCalculator>()
         {
             @Override
-            public StatCalculator call(StatCalculator agg, Geometry object)
+            public StatCalculator call(StatCalculator agg, GeometryFeature object)
                     throws Exception
             {
-                return StatCalculator.add(agg, object);
+                return StatCalculator.add(agg, object.getDefaultGeometry());
             }
         };
 

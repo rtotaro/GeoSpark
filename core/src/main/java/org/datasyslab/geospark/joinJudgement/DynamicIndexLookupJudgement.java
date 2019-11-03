@@ -22,6 +22,7 @@ import org.apache.spark.api.java.function.FlatMapFunction2;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.enums.JoinBuildSide;
 import org.datasyslab.geospark.monitoring.GeoSparkMetric;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
@@ -36,7 +37,7 @@ import java.util.*;
 
 import static org.datasyslab.geospark.utils.TimeUtils.elapsedSince;
 
-public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
+public class DynamicIndexLookupJudgement<T extends GeometryFeature, U extends GeometryFeature>
         extends JudgementBase
         implements FlatMapFunction2<Iterator<U>, Iterator<T>, Pair<U, T>>, Serializable
 {
@@ -88,8 +89,8 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
 
         final boolean buildLeft = (joinBuildSide == JoinBuildSide.LEFT);
 
-        final Iterator<? extends Geometry> buildShapes;
-        final Iterator<? extends Geometry> streamShapes;
+        final Iterator<? extends GeometryFeature> buildShapes;
+        final Iterator<? extends GeometryFeature> streamShapes;
         if (buildLeft) {
             buildShapes = leftShapes;
             streamShapes = rightShapes;
@@ -155,19 +156,19 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
                 while (streamShapes.hasNext()) {
                     shapeCnt++;
                     streamCount.add(1);
-                    final Geometry streamShape = streamShapes.next();
+                    final GeometryFeature streamShape = streamShapes.next();
                     final List candidates = spatialIndex.query(streamShape.getEnvelopeInternal());
                     for (Object candidate : candidates) {
                         candidateCount.add(1);
-                        final Geometry buildShape = (Geometry) candidate;
+                        final GeometryFeature buildShape = (GeometryFeature) candidate;
                         if (buildLeft) {
-                            if (match(buildShape, streamShape)) {
+                            if (match(buildShape.getDefaultGeometry(), streamShape.getDefaultGeometry())) {
                                 batch.add(Pair.of((U) buildShape, (T) streamShape));
                                 resultCount.add(1);
                             }
                         }
                         else {
-                            if (match(streamShape, buildShape)) {
+                            if (match(streamShape.getDefaultGeometry(), buildShape.getDefaultGeometry())) {
                                 batch.add(Pair.of((U) streamShape, (T) buildShape));
                                 resultCount.add(1);
                             }
@@ -191,13 +192,13 @@ public class DynamicIndexLookupJudgement<T extends Geometry, U extends Geometry>
         };
     }
 
-    private SpatialIndex buildIndex(Iterator<? extends Geometry> geometries)
+    private SpatialIndex buildIndex(Iterator<? extends GeometryFeature> geometries)
     {
         long startTime = System.currentTimeMillis();
         long count = 0;
         final SpatialIndex index = newIndex();
         while (geometries.hasNext()) {
-            Geometry geometry = geometries.next();
+            GeometryFeature geometry = geometries.next();
             index.insert(geometry.getEnvelopeInternal(), geometry);
             count++;
         }

@@ -17,6 +17,7 @@
 package org.datasyslab.geospark.knnJudgement;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ import java.util.PriorityQueue;
 /**
  * The Class GeometryKnnJudgement.
  */
-public class KnnJudgement<U extends Geometry, T extends Geometry>
+public class KnnJudgement<U extends GeometryFeature, T extends GeometryFeature>
         implements FlatMapFunction<Iterator<T>, T>, Serializable
 {
 
@@ -69,8 +70,8 @@ public class KnnJudgement<U extends Geometry, T extends Geometry>
             }
             else {
                 T curpoint = input.next();
-                double distance = curpoint.distance(queryCenter);
-                double largestDistanceInPriQueue = ((Geometry) pq.peek()).distance(queryCenter);
+                double distance = curpoint.getDefaultGeometry().distance(queryCenter.getDefaultGeometry());
+                double largestDistanceInPriQueue = pq.peek().getDefaultGeometry().distance(queryCenter.getDefaultGeometry());
                 if (largestDistanceInPriQueue > distance) {
                     pq.poll();
                     pq.offer(curpoint);

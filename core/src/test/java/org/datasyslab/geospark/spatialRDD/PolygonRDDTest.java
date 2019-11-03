@@ -26,6 +26,7 @@
 package org.datasyslab.geospark.spatialRDD;
 
 import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -236,7 +237,7 @@ public class PolygonRDDTest
     {
         PolygonRDD polygonRDD = new PolygonRDD(sc, InputLocation, splitter, true, numPartitions, StorageLevel.MEMORY_ONLY());
         RectangleRDD rectangleRDD = polygonRDD.MinimumBoundingRectangle();
-        List<Polygon> result = rectangleRDD.rawSpatialRDD.collect();
+        List<PolygonFeature> result = rectangleRDD.rawSpatialRDD.collect();
         assert result.size() > -1;
     }  
 

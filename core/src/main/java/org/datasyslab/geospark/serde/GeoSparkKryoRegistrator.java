@@ -22,9 +22,13 @@ import org.apache.spark.serializer.KryoRegistrator;
 import org.datasyslab.geospark.geometryObjects.Circle;
 import org.datasyslab.geospark.geometryObjects.GeometrySerde;
 import org.datasyslab.geospark.geometryObjects.JavaSpatialIndexSerde;
+import org.locationtech.geomesa.features.kryo.KryoFeatureSerializer;
+import org.locationtech.geomesa.features.kryo.KryoFeatureSerializer$;
+import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.quadtree.Quadtree;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.opengis.feature.simple.SimpleFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +60,8 @@ public class GeoSparkKryoRegistrator
         // TODO: Replace the default serializer with default spatial index serializer
         kryo.register(Quadtree.class, new JavaSpatialIndexSerde());
         kryo.register(STRtree.class, new JavaSpatialIndexSerde());
+
+        new GeoMesaSparkKryoRegistrator().registerClasses(kryo);
 
     }
 }

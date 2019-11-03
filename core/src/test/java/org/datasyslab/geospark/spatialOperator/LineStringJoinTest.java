@@ -25,6 +25,8 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
+import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -107,7 +109,7 @@ public class LineStringJoinTest
 
         partitionRdds(queryRDD, spatialRDD);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         sanityCheckJoinResults(result);
         assertEquals(expectedMatchCount, countJoinResults(result));
@@ -147,7 +149,7 @@ public class LineStringJoinTest
         partitionRdds(queryRDD, spatialRDD);
         spatialRDD.buildIndex(indexType, true);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         sanityCheckJoinResults(result);
         assertEquals(expectedMatchCount, countJoinResults(result));
@@ -176,7 +178,7 @@ public class LineStringJoinTest
         partitionRdds(queryRDD, spatialRDD);
 
         JoinQuery.JoinParams joinParams = new JoinQuery.JoinParams(true, indexType, JoinBuildSide.LEFT);
-        List<Tuple2<Polygon, LineString>> results = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
+        List<Tuple2<PolygonFeature, LineStringFeature>> results = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
 
         sanityCheckFlatJoinResults(results);
 

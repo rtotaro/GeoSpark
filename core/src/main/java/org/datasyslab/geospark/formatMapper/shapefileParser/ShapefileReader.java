@@ -28,6 +28,7 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.fieldname.FieldnameI
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.spatialRDD.LineStringRDD;
 import org.datasyslab.geospark.spatialRDD.PointRDD;
 import org.datasyslab.geospark.spatialRDD.PolygonRDD;
@@ -51,7 +52,7 @@ public class ShapefileReader
      * @param inputPath
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath)
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath)
     {
         return readToGeometryRDD(sc, inputPath, new GeometryFactory());
     }
@@ -64,9 +65,9 @@ public class ShapefileReader
      * @param geometryFactory
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath, final GeometryFactory geometryFactory)
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath, final GeometryFactory geometryFactory)
     {
-        SpatialRDD<Geometry> spatialRDD = new SpatialRDD();
+        SpatialRDD<GeometryFeature> spatialRDD = new SpatialRDD();
         spatialRDD.rawSpatialRDD = readShapefile(sc, inputPath, geometryFactory);
         try {
             spatialRDD.fieldNames = readFieldNames(sc, inputPath);
@@ -85,7 +86,7 @@ public class ShapefileReader
      * @param geometryFactory
      * @return
      */
-    private static JavaRDD<Geometry> readShapefile(
+    private static JavaRDD<GeometryFeature> readShapefile(
             JavaSparkContext sc,
             String inputPath,
             final GeometryFactory geometryFactory
@@ -98,14 +99,14 @@ public class ShapefileReader
                 PrimitiveShape.class,
                 sc.hadoopConfiguration()
         );
-        return shapePrimitiveRdd.map(new Function<Tuple2<ShapeKey, PrimitiveShape>, Geometry>()
+        return shapePrimitiveRdd.map(new Function<Tuple2<ShapeKey, PrimitiveShape>, GeometryFeature>()
         {
             @Override
-            public Geometry call(Tuple2<ShapeKey, PrimitiveShape> primitiveTuple)
+            public GeometryFeature call(Tuple2<ShapeKey, PrimitiveShape> primitiveTuple)
                     throws Exception
             {
                 // parse bytes to shape
-                return primitiveTuple._2().getShape(geometryFactory);
+                return GeometryFeature.createGeometryFeature(primitiveTuple._2().getShape(geometryFactory));
             }
         });
     }

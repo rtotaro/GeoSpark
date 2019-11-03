@@ -30,6 +30,8 @@ import org.datasyslab.geospark.GeoSparkTestBase;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.datasyslab.geospark.spatialRDD.*;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
@@ -158,8 +160,8 @@ class JoinTestBase
         return new RectangleRDD(rdd.rawSpatialRDD, StorageLevel.MEMORY_ONLY());
     }
 
-    protected void partitionRdds(SpatialRDD<? extends Geometry> queryRDD,
-            SpatialRDD<? extends Geometry> spatialRDD)
+    protected void partitionRdds(SpatialRDD<? extends GeometryFeature> queryRDD,
+            SpatialRDD<? extends GeometryFeature> spatialRDD)
             throws Exception
     {
         spatialRDD.spatialPartitioning(gridType);
@@ -181,18 +183,18 @@ class JoinTestBase
         return gridType == GridType.QUADTREE || gridType == GridType.KDBTREE;
     }
 
-    protected <T extends Geometry> long countJoinResults(List<Tuple2<Polygon, HashSet<T>>> results)
+    protected <T extends GeometryFeature> long countJoinResults(List<Tuple2<PolygonFeature, HashSet<T>>> results)
     {
         int count = 0;
-        for (final Tuple2<Polygon, HashSet<T>> tuple : results) {
+        for (final Tuple2<PolygonFeature, HashSet<T>> tuple : results) {
             count += tuple._2().size();
         }
         return count;
     }
 
-    protected <T extends Geometry> void sanityCheckJoinResults(List<Tuple2<Polygon, HashSet<T>>> results)
+    protected <T extends GeometryFeature> void sanityCheckJoinResults(List<Tuple2<PolygonFeature, HashSet<T>>> results)
     {
-        for (final Tuple2<Polygon, HashSet<T>> tuple : results) {
+        for (final Tuple2<PolygonFeature, HashSet<T>> tuple : results) {
             assertNotNull(tuple._1().getUserData());
             assertFalse(tuple._2().isEmpty());
             for (final T shape : tuple._2()) {
@@ -202,11 +204,11 @@ class JoinTestBase
         }
     }
 
-    protected <T extends Geometry> void sanityCheckFlatJoinResults(List<Tuple2<Polygon, T>> results)
+    protected <T extends GeometryFeature> void sanityCheckFlatJoinResults(List<Tuple2<PolygonFeature, T>> results)
     {
-        for (final Tuple2<Polygon, T> tuple : results) {
-//            assertNotNull(tuple._1().getUserData());
-//            assertNotNull(tuple._2().getUserData());
+        for (final Tuple2<PolygonFeature, T> tuple : results) {
+            assertNotNull(tuple._1().getGeomData());
+            assertNotNull(tuple._2().getGeomData());
             assertTrue(tuple._1().intersects(tuple._2()));
         }
     }

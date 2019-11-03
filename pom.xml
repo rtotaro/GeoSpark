@@ -13,7 +13,7 @@
 <!--    <module>sql</module>-->
 <!--    <module>viz</module>-->
   </modules>
-
+    org.geotools.factory.FactoryFinder
     <licenses>
         <license>
             <name>MIT license</name>
@@ -50,7 +50,7 @@
         <hadoop.version>2.6.4</hadoop.version>
         <jts2geojson.version>0.14.3</jts2geojson.version>
         <jts.version>1.16.0</jts.version>
-        <gt.version>21.1</gt.version>
+        <gt.version>20.0</gt.version>
     </properties>
 
     <dependencyManagement>

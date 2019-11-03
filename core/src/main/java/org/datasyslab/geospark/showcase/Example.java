@@ -25,6 +25,8 @@ import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileRDD;
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.spatialOperator.JoinQuery;
 import org.datasyslab.geospark.spatialOperator.KNNQuery;
 import org.datasyslab.geospark.spatialOperator.RangeQuery;
@@ -131,7 +133,7 @@ public class Example
     /**
      * The k NN query point.
      */
-    static Point kNNQueryPoint;
+    static PointFeature kNNQueryPoint;
 
     /**
      * The range query window.
@@ -168,7 +170,7 @@ public class Example
         PolygonRDDEndOffset = 8;
 
         geometryFactory = new GeometryFactory();
-        kNNQueryPoint = geometryFactory.createPoint(new Coordinate(-84.01, 34.01));
+        kNNQueryPoint = (PointFeature) GeometryFeature.createGeometryFeature(geometryFactory.createPoint(new Coordinate(-84.01, 34.01)));
         rangeQueryWindow = new Envelope(-90.01, -80.01, 30.01, 40.01);
         joinQueryPartitioningType = GridType.QUADTREE;
         eachQueryLoopTimes = 5;
@@ -241,7 +243,7 @@ public class Example
         objectRDD = new PointRDD(sc, PointRDDInputLocation, PointRDDOffset, PointRDDSplitter, true, StorageLevel.MEMORY_ONLY());
         objectRDD.rawSpatialRDD.persist(StorageLevel.MEMORY_ONLY());
         for (int i = 0; i < eachQueryLoopTimes; i++) {
-            List<Point> result = KNNQuery.SpatialKnnQuery(objectRDD, kNNQueryPoint, 1000, false);
+            List<PointFeature> result = KNNQuery.SpatialKnnQuery(objectRDD, kNNQueryPoint, 1000, false);
             assert result.size() > -1;
         }
     }
@@ -258,7 +260,7 @@ public class Example
         objectRDD.buildIndex(PointRDDIndexType, false);
         objectRDD.indexedRawRDD.persist(StorageLevel.MEMORY_ONLY());
         for (int i = 0; i < eachQueryLoopTimes; i++) {
-            List<Point> result = KNNQuery.SpatialKnnQuery(objectRDD, kNNQueryPoint, 1000, true);
+            List<PointFeature> result = KNNQuery.SpatialKnnQuery(objectRDD, kNNQueryPoint, 1000, true);
             assert result.size() > -1;
         }
     }

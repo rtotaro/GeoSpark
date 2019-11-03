@@ -19,6 +19,7 @@ package org.datasyslab.geospark.spatialRddTool;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
@@ -29,7 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public final class IndexBuilder<T extends Geometry>
+public final class IndexBuilder<T extends GeometryFeature>
         implements FlatMapFunction<Iterator<T>, SpatialIndex>
 {
     IndexType indexType;

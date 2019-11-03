@@ -25,6 +25,8 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -125,14 +127,14 @@ public class PointJoinTest
         testNestedLoopInt(queryRDD, expectedPolygonMatchCount);
     }
 
-    private void testNestedLoopInt(SpatialRDD<Polygon> queryRDD, long expectedCount)
+    private void testNestedLoopInt(SpatialRDD<PolygonFeature> queryRDD, long expectedCount)
             throws Exception
     {
         PointRDD spatialRDD = createPointRDD();
 
         partitionRdds(queryRDD, spatialRDD);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         sanityCheckJoinResults(result);
         assertEquals(expectedCount, countJoinResults(result));
@@ -190,7 +192,7 @@ public class PointJoinTest
         testIndexInt(queryRDD, IndexType.QUADTREE, expectedPolygonMatchCount);
     }
 
-    private void testIndexInt(SpatialRDD<Polygon> queryRDD, IndexType indexType, long expectedCount)
+    private void testIndexInt(SpatialRDD<PolygonFeature> queryRDD, IndexType indexType, long expectedCount)
             throws Exception
     {
         PointRDD spatialRDD = createPointRDD();
@@ -198,7 +200,7 @@ public class PointJoinTest
         partitionRdds(queryRDD, spatialRDD);
         spatialRDD.buildIndex(indexType, true);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         sanityCheckJoinResults(result);
         assertEquals(expectedCount, countJoinResults(result));
@@ -224,7 +226,7 @@ public class PointJoinTest
         testDynamicRTreeInt(polygonRDD, IndexType.RTREE, expectedCount);
     }
 
-    private void testDynamicRTreeInt(SpatialRDD<Polygon> queryRDD, IndexType indexType, long expectedCount)
+    private void testDynamicRTreeInt(SpatialRDD<PolygonFeature> queryRDD, IndexType indexType, long expectedCount)
             throws Exception
     {
         PointRDD spatialRDD = createPointRDD();
@@ -232,7 +234,7 @@ public class PointJoinTest
         partitionRdds(queryRDD, spatialRDD);
 
         JoinQuery.JoinParams joinParams = new JoinQuery.JoinParams(true, indexType, JoinBuildSide.LEFT);
-        List<Tuple2<Polygon, Point>> results = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
+        List<Tuple2<PolygonFeature, PointFeature>> results = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
 
         sanityCheckFlatJoinResults(results);
         assertEquals(expectedCount, results.size());

@@ -29,6 +29,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,7 +104,7 @@ public class LineStringKnnTest
     /**
      * The query point.
      */
-    static Point queryPoint;
+    static PointFeature queryPoint;
 
     /**
      * Once executed before all.
@@ -149,7 +152,7 @@ public class LineStringKnnTest
                 }
             }
         }
-        queryPoint = fact.createPoint(new Coordinate(-84.01, 34.01));
+        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(-84.01, 34.01)));
     }
 
     /**
@@ -173,7 +176,7 @@ public class LineStringKnnTest
         LineStringRDD lineStringRDD = new LineStringRDD(sc, InputLocation, splitter, true);
 
         for (int i = 0; i < loopTimes; i++) {
-            List<LineString> result = KNNQuery.SpatialKnnQuery(lineStringRDD, queryPoint, 5, false);
+            List<LineStringFeature> result = KNNQuery.SpatialKnnQuery(lineStringRDD, queryPoint, 5, false);
             assert result.size() > -1;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -192,7 +195,7 @@ public class LineStringKnnTest
         LineStringRDD lineStringRDD = new LineStringRDD(sc, InputLocation, splitter, true);
         lineStringRDD.buildIndex(IndexType.RTREE, false);
         for (int i = 0; i < loopTimes; i++) {
-            List<LineString> result = KNNQuery.SpatialKnnQuery(lineStringRDD, queryPoint, 5, true);
+            List<LineStringFeature> result = KNNQuery.SpatialKnnQuery(lineStringRDD, queryPoint, 5, true);
             assert result.size() > -1;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());

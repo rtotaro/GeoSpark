@@ -29,6 +29,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -104,7 +107,7 @@ public class RectangleKnnTest
     /**
      * The query point.
      */
-    static Point queryPoint;
+    static PointFeature queryPoint;
 
     /**
      * The top K.
@@ -157,7 +160,7 @@ public class RectangleKnnTest
                 }
             }
         }
-        queryPoint = fact.createPoint(new Coordinate(-84.01, 34.01));
+        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(-84.01, 34.01)));
         topK = 100;
     }
 
@@ -182,7 +185,7 @@ public class RectangleKnnTest
         RectangleRDD rectangleRDD = new RectangleRDD(sc, InputLocation, offset, splitter, true);
 
         for (int i = 0; i < loopTimes; i++) {
-            List<Polygon> result = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, false);
+            List<PolygonFeature> result = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, false);
             assert result.size() > -1;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -201,7 +204,7 @@ public class RectangleKnnTest
         RectangleRDD rectangleRDD = new RectangleRDD(sc, InputLocation, offset, splitter, true);
         rectangleRDD.buildIndex(IndexType.RTREE, false);
         for (int i = 0; i < loopTimes; i++) {
-            List<Polygon> result = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, true);
+            List<PolygonFeature> result = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, true);
             assert result.size() > -1;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -218,12 +221,12 @@ public class RectangleKnnTest
             throws Exception
     {
         RectangleRDD rectangleRDD = new RectangleRDD(sc, InputLocation, offset, splitter, true);
-        List<Polygon> resultNoIndex = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, false);
+        List<PolygonFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, false);
         rectangleRDD.buildIndex(IndexType.RTREE, false);
-        List<Polygon> resultWithIndex = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, true);
+        List<PolygonFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(rectangleRDD, queryPoint, topK, true);
 
-        List<Polygon> resultNoIndexModifiable = new ArrayList<Polygon>(resultNoIndex);
-        List<Polygon> resultWithIndexModifiable = new ArrayList<Polygon>(resultWithIndex);
+        List<PolygonFeature> resultNoIndexModifiable = new ArrayList<PolygonFeature>(resultNoIndex);
+        List<PolygonFeature> resultWithIndexModifiable = new ArrayList<PolygonFeature>(resultWithIndex);
 
         GeometryDistanceComparator rectangleDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
         Collections.sort(resultNoIndexModifiable, rectangleDistanceComparator);

@@ -26,6 +26,10 @@
 package org.datasyslab.geospark.spatialOperator;
 
 import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,52 +55,52 @@ public class JoinQueryCorrectnessChecker
     /**
      * The test polygon window set.
      */
-    public static List<Polygon> testPolygonWindowSet;
+    public static List<PolygonFeature> testPolygonWindowSet;
 
     /**
      * The test inside polygon set.
      */
-    public static List<Polygon> testInsidePolygonSet;
+    public static List<PolygonFeature> testInsidePolygonSet;
 
     /**
      * The test overlapped polygon set.
      */
-    public static List<Polygon> testOverlappedPolygonSet;
+    public static List<PolygonFeature> testOverlappedPolygonSet;
 
     /**
      * The test outside polygon set.
      */
-    public static List<Polygon> testOutsidePolygonSet;
+    public static List<PolygonFeature> testOutsidePolygonSet;
 
     /**
      * The test inside line string set.
      */
-    public static List<LineString> testInsideLineStringSet;
+    public static List<LineStringFeature> testInsideLineStringSet;
 
     /**
      * The test overlapped line string set.
      */
-    public static List<LineString> testOverlappedLineStringSet;
+    public static List<LineStringFeature> testOverlappedLineStringSet;
 
     /**
      * The test outside line string set.
      */
-    public static List<LineString> testOutsideLineStringSet;
+    public static List<LineStringFeature> testOutsideLineStringSet;
 
     /**
      * The test inside point set.
      */
-    public static List<Point> testInsidePointSet;
+    public static List<PointFeature> testInsidePointSet;
 
     /**
      * The test on boundary point set.
      */
-    public static List<Point> testOnBoundaryPointSet;
+    public static List<PointFeature> testOnBoundaryPointSet;
 
     /**
      * The test outside point set.
      */
-    public static List<Point> testOutsidePointSet;
+    public static List<PointFeature> testOutsidePointSet;
 
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -150,38 +154,38 @@ public class JoinQueryCorrectnessChecker
                 String a = "a:" + id;
                 String b = "b:" + id;
 
-                testPolygonWindowSet.add(wrap(makeSquare(baseX, baseY, 5), a));
-                testPolygonWindowSet.add(wrap(makeSquare(baseX, baseY, 5), b));
+                testPolygonWindowSet.add((PolygonFeature) wrap(makeSquare(baseX, baseY, 5), a));
+                testPolygonWindowSet.add((PolygonFeature)wrap(makeSquare(baseX, baseY, 5), b));
 
                 // Polygons
-                testInsidePolygonSet.add(wrap(makeSquare(baseX + 2, baseY + 2, 2), a));
-                testInsidePolygonSet.add(wrap(makeSquare(baseX + 2, baseY + 2, 2), b));
+                testInsidePolygonSet.add((PolygonFeature)wrap(makeSquare(baseX + 2, baseY + 2, 2), a));
+                testInsidePolygonSet.add((PolygonFeature)wrap(makeSquare(baseX + 2, baseY + 2, 2), b));
 
-                testOverlappedPolygonSet.add(wrap(makeSquare(baseX + 3, baseY + 3, 3), a));
-                testOverlappedPolygonSet.add(wrap(makeSquare(baseX + 3, baseY + 3, 3), b));
+                testOverlappedPolygonSet.add((PolygonFeature)wrap(makeSquare(baseX + 3, baseY + 3, 3), a));
+                testOverlappedPolygonSet.add((PolygonFeature)wrap(makeSquare(baseX + 3, baseY + 3, 3), b));
 
-                testOutsidePolygonSet.add(wrap(makeSquare(baseX + 6, baseY + 6, 3), a));
-                testOutsidePolygonSet.add(wrap(makeSquare(baseX + 6, baseY + 6, 3), b));
+                testOutsidePolygonSet.add((PolygonFeature)wrap(makeSquare(baseX + 6, baseY + 6, 3), a));
+                testOutsidePolygonSet.add((PolygonFeature)wrap(makeSquare(baseX + 6, baseY + 6, 3), b));
 
                 // LineStrings
-                testInsideLineStringSet.add(wrap(makeSquareLine(baseX + 2, baseY + 2, 2), a));
-                testInsideLineStringSet.add(wrap(makeSquareLine(baseX + 2, baseY + 2, 2), b));
+                testInsideLineStringSet.add((LineStringFeature) wrap(makeSquareLine(baseX + 2, baseY + 2, 2), a));
+                testInsideLineStringSet.add((LineStringFeature)wrap(makeSquareLine(baseX + 2, baseY + 2, 2), b));
 
-                testOverlappedLineStringSet.add(wrap(makeSquareLine(baseX + 3, baseY + 3, 3), a));
-                testOverlappedLineStringSet.add(wrap(makeSquareLine(baseX + 3, baseY + 3, 3), b));
+                testOverlappedLineStringSet.add((LineStringFeature)wrap(makeSquareLine(baseX + 3, baseY + 3, 3), a));
+                testOverlappedLineStringSet.add((LineStringFeature)wrap(makeSquareLine(baseX + 3, baseY + 3, 3), b));
 
-                testOutsideLineStringSet.add(wrap(makeSquareLine(baseX + 6, baseY + 6, 3), a));
-                testOutsideLineStringSet.add(wrap(makeSquareLine(baseX + 6, baseY + 6, 3), b));
+                testOutsideLineStringSet.add((LineStringFeature)wrap(makeSquareLine(baseX + 6, baseY + 6, 3), a));
+                testOutsideLineStringSet.add((LineStringFeature)wrap(makeSquareLine(baseX + 6, baseY + 6, 3), b));
 
                 // Points
-                testInsidePointSet.add(wrap(makePoint(baseX + 2.5, baseY + 2.5), a));
-                testInsidePointSet.add(wrap(makePoint(baseX + 2.5, baseY + 2.5), b));
+                testInsidePointSet.add((PointFeature)wrap(makePoint(baseX + 2.5, baseY + 2.5), a));
+                testInsidePointSet.add((PointFeature)wrap(makePoint(baseX + 2.5, baseY + 2.5), b));
 
-                testOnBoundaryPointSet.add(wrap(makePoint(baseX + 5, baseY + 5), a));
-                testOnBoundaryPointSet.add(wrap(makePoint(baseX + 5, baseY + 5), b));
+                testOnBoundaryPointSet.add((PointFeature)wrap(makePoint(baseX + 5, baseY + 5), a));
+                testOnBoundaryPointSet.add((PointFeature)wrap(makePoint(baseX + 5, baseY + 5), b));
 
-                testOutsidePointSet.add(wrap(makePoint(baseX + 6, baseY + 6), a));
-                testOutsidePointSet.add(wrap(makePoint(baseX + 6, baseY + 6), b));
+                testOutsidePointSet.add((PointFeature)wrap(makePoint(baseX + 6, baseY + 6), a));
+                testOutsidePointSet.add((PointFeature)wrap(makePoint(baseX + 6, baseY + 6), b));
             }
         }
     }
@@ -222,13 +226,13 @@ public class JoinQueryCorrectnessChecker
         return geometryFactory.createPoint(new Coordinate(x, y));
     }
 
-    private static <T extends Geometry> T wrap(T geometry, Object userData)
+    private static <T extends Geometry> GeometryFeature<T> wrap(T geometry, Object userData)
     {
         geometry.setUserData(userData);
-        return geometry;
+        return GeometryFeature.createGeometryFeature(geometry);
     }
 
-    private <T extends Geometry, U extends Geometry> void prepareRDDs(SpatialRDD<T> objectRDD,
+    private <T extends GeometryFeature, U extends GeometryFeature> void prepareRDDs(SpatialRDD<T> objectRDD,
             SpatialRDD<U> windowRDD)
             throws Exception
     {
@@ -251,10 +255,10 @@ public class JoinQueryCorrectnessChecker
         PointRDD objectRDD = new PointRDD(sc.parallelize(this.testInsidePointSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Polygon, HashSet<Point>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -271,10 +275,10 @@ public class JoinQueryCorrectnessChecker
         PointRDD objectRDD = new PointRDD(sc.parallelize(this.testOnBoundaryPointSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Polygon, HashSet<Point>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -291,10 +295,10 @@ public class JoinQueryCorrectnessChecker
         PointRDD objectRDD = new PointRDD(sc.parallelize(this.testOutsidePointSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         assertEquals(0, result.size());
 
-        List<Tuple2<Polygon, HashSet<Point>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         assertEquals(0, resultNoIndex.size());
     }
 
@@ -311,10 +315,10 @@ public class JoinQueryCorrectnessChecker
         LineStringRDD objectRDD = new LineStringRDD(sc.parallelize(this.testInsideLineStringSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -331,10 +335,10 @@ public class JoinQueryCorrectnessChecker
         LineStringRDD objectRDD = new LineStringRDD(sc.parallelize(this.testOverlappedLineStringSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, true).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, true).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -351,10 +355,10 @@ public class JoinQueryCorrectnessChecker
         LineStringRDD objectRDD = new LineStringRDD(sc.parallelize(this.testOutsideLineStringSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<LineString>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         assertEquals(0, result.size());
 
-        List<Tuple2<Polygon, HashSet<LineString>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<LineStringFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         assertEquals(0, resultNoIndex.size());
     }
 
@@ -371,10 +375,10 @@ public class JoinQueryCorrectnessChecker
         PolygonRDD objectRDD = new PolygonRDD(sc.parallelize(this.testInsidePolygonSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -391,20 +395,20 @@ public class JoinQueryCorrectnessChecker
         PolygonRDD objectRDD = new PolygonRDD(sc.parallelize(this.testOverlappedPolygonSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, true).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, true).collect();
         verifyJoinResults(resultNoIndex);
     }
 
-    private <U extends Geometry, T extends Geometry> void verifyJoinResults(List<Tuple2<U, HashSet<T>>> result)
+    private <U extends GeometryFeature, T extends GeometryFeature> void verifyJoinResults(List<Tuple2<U, HashSet<T>>> result)
     {
         assertEquals(200, result.size());
         for (Tuple2<U, HashSet<T>> tuple : result) {
             U window = tuple._1;
             Set<T> objects = tuple._2;
-            String windowUserData = (String) window.getUserData();
+            String windowUserData = (String) window.getGeomData();
 
             String[] tokens = windowUserData.split(":", 2);
             String prefix = tokens[0];
@@ -415,7 +419,7 @@ public class JoinQueryCorrectnessChecker
 
             final Set<String> objectIds = new HashSet<>();
             for (T object : objects) {
-                objectIds.add((String) object.getUserData());
+                objectIds.add((String) object.getGeomData());
             }
 
             assertEquals(new HashSet(Arrays.asList("a:" + id, "b:" + id)), objectIds);
@@ -435,10 +439,10 @@ public class JoinQueryCorrectnessChecker
         PolygonRDD objectRDD = new PolygonRDD(sc.parallelize(this.testOutsidePolygonSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, true, false).collect();
         assertEquals(0, result.size());
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> resultNoIndex = JoinQuery.SpatialJoinQuery(objectRDD, windowRDD, false, false).collect();
         assertEquals(0, result.size());
     }
 
@@ -456,10 +460,10 @@ public class JoinQueryCorrectnessChecker
         PolygonRDD objectRDD = new PolygonRDD(sc.parallelize(this.testInsidePolygonSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> result = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> result = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, false).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> resultNoIndex = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, false, false).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> resultNoIndex = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, false, false).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -477,10 +481,10 @@ public class JoinQueryCorrectnessChecker
         PolygonRDD objectRDD = new PolygonRDD(sc.parallelize(this.testOverlappedPolygonSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> result = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, true).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> result = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, true).collect();
         verifyJoinResults(result);
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> resultNoIndex = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, false, true).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> resultNoIndex = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, false, true).collect();
         verifyJoinResults(resultNoIndex);
     }
 
@@ -498,10 +502,10 @@ public class JoinQueryCorrectnessChecker
         PolygonRDD objectRDD = new PolygonRDD(sc.parallelize(this.testOutsidePolygonSet), StorageLevel.MEMORY_ONLY());
         prepareRDDs(objectRDD, windowRDD);
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> result = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, true).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> result = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, true).collect();
         assertEquals(0, result.size());
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> resultNoIndex = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, false, true).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> resultNoIndex = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, false, true).collect();
         assertEquals(0, resultNoIndex.size());
     }
 }

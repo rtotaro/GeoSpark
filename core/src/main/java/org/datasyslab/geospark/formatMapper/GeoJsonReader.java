@@ -19,6 +19,7 @@ package org.datasyslab.geospark.formatMapper;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.datasyslab.geospark.enums.FileDataSplitter;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.locationtech.jts.geom.Geometry;
 
@@ -31,7 +32,7 @@ public class GeoJsonReader extends RddReader
      * @param inputPath
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath) {
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath) {
         return readToGeometryRDD(sc, inputPath, true, false);
     }
 
@@ -43,7 +44,7 @@ public class GeoJsonReader extends RddReader
      * @param skipSyntacticallyInvalidGeometries whether allows GeoSpark to automatically skip syntax-invalid geometries, rather than throw errors
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaSparkContext sc, String inputPath, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         JavaRDD rawTextRDD = sc.textFile(inputPath);
         FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(FileDataSplitter.GEOJSON, true);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
@@ -56,7 +57,7 @@ public class GeoJsonReader extends RddReader
      * @param rawTextRDD a string type RDD
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaRDD rawTextRDD) {
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaRDD rawTextRDD) {
         return readToGeometryRDD(rawTextRDD, true, false);
     }
 
@@ -67,7 +68,7 @@ public class GeoJsonReader extends RddReader
      * @param skipSyntacticallyInvalidGeometries whether allows GeoSpark to automatically skip syntax-invalid geometries, rather than throw errors
      * @return
      */
-    public static SpatialRDD<Geometry> readToGeometryRDD(JavaRDD rawTextRDD, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
+    public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaRDD rawTextRDD, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(FileDataSplitter.GEOJSON, true);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;

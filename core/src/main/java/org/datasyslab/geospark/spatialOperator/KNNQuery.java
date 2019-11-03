@@ -20,9 +20,11 @@ import org.apache.spark.api.java.JavaRDD;
 import org.datasyslab.geospark.knnJudgement.GeometryDistanceComparator;
 import org.datasyslab.geospark.knnJudgement.KnnJudgement;
 import org.datasyslab.geospark.knnJudgement.KnnJudgementUsingIndex;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.datasyslab.geospark.utils.CRSTransformation;
 import org.locationtech.jts.geom.Geometry;
+import scala.Tuple3;
 
 import java.io.Serializable;
 import java.util.List;
@@ -45,11 +47,11 @@ public class KNNQuery
      * @param useIndex the use index
      * @return the list
      */
-    public static <U extends Geometry, T extends Geometry> List<T> SpatialKnnQuery(SpatialRDD<T> spatialRDD, U originalQueryPoint, Integer k, boolean useIndex)
+    public static <U extends GeometryFeature, T extends GeometryFeature> List<T> SpatialKnnQuery(SpatialRDD<T> spatialRDD, U originalQueryPoint, Integer k, boolean useIndex)
     {
         U queryCenter = originalQueryPoint;
         if (spatialRDD.getCRStransformation()) {
-            queryCenter = CRSTransformation.Transform(spatialRDD.getSourceEpsgCode(), spatialRDD.getTargetEpgsgCode(), originalQueryPoint);
+            queryCenter = (U) originalQueryPoint.transform(geom -> CRSTransformation.Transform(spatialRDD.getSourceEpsgCode(), spatialRDD.getTargetEpgsgCode(),(Geometry) geom));
         }
 
         if (useIndex) {

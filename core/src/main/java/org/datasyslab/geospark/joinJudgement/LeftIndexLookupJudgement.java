@@ -19,6 +19,7 @@ package org.datasyslab.geospark.joinJudgement;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.api.java.function.FlatMapFunction2;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LeftIndexLookupJudgement<T extends Geometry, U extends Geometry>
+public class LeftIndexLookupJudgement<T extends GeometryFeature, U extends GeometryFeature>
         extends JudgementBase
         implements FlatMapFunction2<Iterator<SpatialIndex>, Iterator<U>, Pair<T, U>>, Serializable
 {
@@ -56,10 +57,10 @@ public class LeftIndexLookupJudgement<T extends Geometry, U extends Geometry>
         SpatialIndex treeIndex = indexIterator.next();
         while (streamShapes.hasNext()) {
             U streamShape = streamShapes.next();
-            List<Geometry> candidates = treeIndex.query(streamShape.getEnvelopeInternal());
-            for (Geometry candidate : candidates) {
+            List<GeometryFeature> candidates = treeIndex.query(streamShape.getEnvelopeInternal());
+            for (GeometryFeature candidate : candidates) {
                 // Refine phase. Use the real polygon (instead of its MBR) to recheck the spatial relation.
-                if (match(candidate, streamShape)) {
+                if (match(candidate.getDefaultGeometry(), streamShape.getDefaultGeometry())) {
                     result.add(Pair.of((T) candidate, streamShape));
                 }
             }

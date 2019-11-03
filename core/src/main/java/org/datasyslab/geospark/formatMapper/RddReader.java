@@ -17,14 +17,15 @@
 package org.datasyslab.geospark.formatMapper;
 
 import org.apache.spark.api.java.JavaRDD;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.locationtech.jts.geom.Geometry;
 
 class RddReader
 {
-    public static SpatialRDD<Geometry> createSpatialRDD(JavaRDD rawTextRDD, FormatMapper<Geometry> formatMapper)
+    public static SpatialRDD<GeometryFeature> createSpatialRDD(JavaRDD rawTextRDD, FormatMapper<Geometry> formatMapper)
     {
-        SpatialRDD spatialRDD = new SpatialRDD<Geometry>();
+        SpatialRDD spatialRDD = new SpatialRDD<GeometryFeature>();
         spatialRDD.rawSpatialRDD = rawTextRDD.mapPartitions(formatMapper);
         spatialRDD.fieldNames = formatMapper.readPropertyNames(rawTextRDD.take(1).get(0).toString());
         return spatialRDD;

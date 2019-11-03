@@ -30,6 +30,10 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -115,7 +119,7 @@ public class CRSTransformationTest
     /**
      * The query point.
      */
-    static Point queryPoint;
+    static PointFeature queryPoint;
 
     /**
      * The grid type.
@@ -142,6 +146,8 @@ public class CRSTransformationTest
             throws Exception
     {
         SparkConf conf = new SparkConf().setAppName("PointRange").setMaster("local[2]");
+        conf.set("spark.serializer", org.apache.spark.serializer.KryoSerializer.class.getName());
+        conf.set("spark.kryo.registrator", GeoSparkKryoRegistrator.class.getName());
         sc = new JavaSparkContext(conf);
         Logger.getLogger("org").setLevel(Level.WARN);
         Logger.getLogger("akka").setLevel(Level.WARN);
@@ -182,7 +188,7 @@ public class CRSTransformationTest
             }
         }
 
-        queryPoint = fact.createPoint(new Coordinate(34.01, -84.01));
+        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(34.01, -84.01)));
         topK = 100;
     }
 
@@ -245,7 +251,7 @@ public class CRSTransformationTest
         PointRDD pointRDD = new PointRDD(sc, InputLocation, offset, splitter, true, StorageLevel.MEMORY_ONLY(), "epsg:4326", "epsg:3005");
 
         for (int i = 0; i < loopTimes; i++) {
-            List<Point> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
+            List<PointFeature> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
             assert result.size() > 0;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -264,7 +270,7 @@ public class CRSTransformationTest
         PointRDD pointRDD = new PointRDD(sc, InputLocation, offset, splitter, true, StorageLevel.MEMORY_ONLY(), "epsg:4326", "epsg:3005");
         pointRDD.buildIndex(IndexType.RTREE, false);
         for (int i = 0; i < loopTimes; i++) {
-            List<Point> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
+            List<PointFeature> result = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
             assert result.size() > 0;
             assert result.get(0).getUserData().toString() != null;
             //System.out.println(result.get(0).getUserData().toString());
@@ -281,12 +287,12 @@ public class CRSTransformationTest
             throws Exception
     {
         PointRDD pointRDD = new PointRDD(sc, InputLocation, offset, splitter, true, StorageLevel.MEMORY_ONLY(), "epsg:4326", "epsg:3005");
-        List<Point> resultNoIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
+        List<PointFeature> resultNoIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, false);
         pointRDD.buildIndex(IndexType.RTREE, false);
-        List<Point> resultWithIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
+        List<PointFeature> resultWithIndex = KNNQuery.SpatialKnnQuery(pointRDD, queryPoint, topK, true);
         GeometryDistanceComparator geometryDistanceComparator = new GeometryDistanceComparator(this.queryPoint, true);
-        List<Point> resultNoIndexModifiable = new ArrayList<>(resultNoIndex);
-        List<Point> resultWithIndexModifiable = new ArrayList<>(resultWithIndex);
+        List<PointFeature> resultNoIndexModifiable = new ArrayList<>(resultNoIndex);
+        List<PointFeature> resultWithIndexModifiable = new ArrayList<>(resultWithIndex);
         Collections.sort(resultNoIndexModifiable, geometryDistanceComparator);
         Collections.sort(resultWithIndexModifiable, geometryDistanceComparator);
         int difference = 0;
@@ -316,7 +322,7 @@ public class CRSTransformationTest
 
         queryRDD.spatialPartitioning(spatialRDD.grids);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         assert result.get(1)._1().getUserData() != null;
         for (int i = 0; i < result.size(); i++) {
@@ -346,7 +352,7 @@ public class CRSTransformationTest
 
         queryRDD.spatialPartitioning(spatialRDD.grids);
 
-        List<Tuple2<Polygon, HashSet<Point>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PointFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         assert result.get(1)._1().getUserData() != null;
         for (int i = 0; i < result.size(); i++) {
@@ -373,12 +379,12 @@ public class CRSTransformationTest
         objectRDD.buildIndex(IndexType.RTREE, true);
         windowRDD.spatialPartitioning(objectRDD.grids);
 
-        List<Tuple2<Geometry, HashSet<Polygon>>> results = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, false).collect();
+        List<Tuple2<GeometryFeature, HashSet<PolygonFeature>>> results = JoinQuery.DistanceJoinQuery(objectRDD, windowRDD, true, false).collect();
         assertEquals(5467, results.size());
 
-        for (Tuple2<Geometry, HashSet<Polygon>> tuple : results) {
-            for (Polygon polygon : tuple._2()) {
-                assertTrue(new Circle(tuple._1(), 0.1).covers(polygon));
+        for (Tuple2<GeometryFeature, HashSet<PolygonFeature>> tuple : results) {
+            for (PolygonFeature polygon : tuple._2()) {
+                assertTrue(new Circle(tuple._1().getDefaultGeometry(), 0.1).covers(polygon.getDefaultGeometry()));
             }
         }
     }

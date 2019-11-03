@@ -25,6 +25,7 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -104,7 +105,7 @@ public class RectangleJoinTest
 
         partitionRdds(queryRDD, spatialRDD);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         sanityCheckJoinResults(result);
         assertEquals(expectedMatchCount, countJoinResults(result));
@@ -143,7 +144,7 @@ public class RectangleJoinTest
         partitionRdds(queryRDD, spatialRDD);
         spatialRDD.buildIndex(indexType, true);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, true).collect();
 
         sanityCheckJoinResults(result);
         assertEquals(expectedMatchCount, countJoinResults(result));
@@ -172,7 +173,7 @@ public class RectangleJoinTest
         partitionRdds(queryRDD, spatialRDD);
 
         JoinQuery.JoinParams joinParams = new JoinQuery.JoinParams(true, indexType, JoinBuildSide.LEFT);
-        List<Tuple2<Polygon, Polygon>> result = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
+        List<Tuple2<PolygonFeature, PolygonFeature>> result = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
 
         sanityCheckFlatJoinResults(result);
 

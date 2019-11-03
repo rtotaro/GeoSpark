@@ -25,6 +25,7 @@
  */
 package org.datasyslab.geospark.spatialOperator;
 
+import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -132,7 +133,7 @@ public class PolygonJoinTest
         partitionRdds(queryRDD, spatialRDD);
 
         final JoinQuery.JoinParams joinParams = new JoinQuery.JoinParams(intersects, indexType, JoinBuildSide.LEFT);
-        final List<Tuple2<Polygon, Polygon>> results = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
+        final List<Tuple2<PolygonFeature, PolygonFeature>> results = JoinQuery.spatialJoin(queryRDD, spatialRDD, joinParams).collect();
         sanityCheckFlatJoinResults(results);
 
         final long expectedCount = expectToPreserveOriginalDuplicates()
@@ -167,7 +168,7 @@ public class PolygonJoinTest
 
         partitionRdds(queryRDD, spatialRDD);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, intersects).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, false, intersects).collect();
         sanityCheckJoinResults(result);
         assertEquals(getExpectedCount(intersects), countJoinResults(result));
     }
@@ -214,7 +215,7 @@ public class PolygonJoinTest
         partitionRdds(queryRDD, spatialRDD);
         spatialRDD.buildIndex(indexType, true);
 
-        List<Tuple2<Polygon, HashSet<Polygon>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, true, intersects).collect();
+        List<Tuple2<PolygonFeature, HashSet<PolygonFeature>>> result = JoinQuery.SpatialJoinQuery(spatialRDD, queryRDD, true, intersects).collect();
         sanityCheckJoinResults(result);
         assertEquals(getExpectedCount(intersects), countJoinResults(result));
     }

@@ -18,6 +18,8 @@ package org.datasyslab.geospark.spatialPartitioning.quadtree;
 
 import org.datasyslab.geospark.enums.GridType;
 import org.datasyslab.geospark.joinJudgement.DedupParams;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.spatialPartitioning.SpatialPartitioner;
 import org.datasyslab.geospark.utils.HalfOpenRectangle;
 import org.datasyslab.geospark.utils.SimpleFeatureUtils;
@@ -46,7 +48,7 @@ public class QuadTreePartitioner
     }
 
     @Override
-    public <T extends SimpleFeature> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
+    public <T extends GeometryFeature> Iterator<Tuple2<Integer, T>> placeObject(T spatialObject)
             throws Exception
     {
         Objects.requireNonNull(spatialObject, "spatialObject");
@@ -55,12 +57,12 @@ public class QuadTreePartitioner
 
         final List<QuadRectangle> matchedPartitions = quadTree.findZones(new QuadRectangle(envelope));
 
-        final Point point = spatialObject instanceof Point ? (Point) spatialObject : null;
+        final PointFeature point = spatialObject instanceof PointFeature ? (PointFeature) spatialObject : null;
 
         final Set<Tuple2<Integer, T>> result = new HashSet<>();
         for (QuadRectangle rectangle : matchedPartitions) {
             // For points, make sure to return only one partition
-            if (point != null && !(new HalfOpenRectangle(rectangle.getEnvelope())).contains(point)) {
+            if (point != null && !(new HalfOpenRectangle(rectangle.getEnvelope())).contains(point.getDefaultGeometry())) {
                 continue;
             }
 

@@ -19,6 +19,7 @@ package org.datasyslab.geospark.formatMapper;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.GeometryType;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
@@ -36,7 +37,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class FormatMapper<T extends Geometry>
-        implements Serializable, FlatMapFunction<Iterator<String>, T>
+        implements Serializable, FlatMapFunction<Iterator<String>, GeometryFeature<T>>
 {
 
     /**
@@ -279,12 +280,12 @@ public class FormatMapper<T extends Geometry>
         return coordinates;
     }
 
-    public <T extends Geometry> void addMultiGeometry(GeometryCollection multiGeometry, List<T> result)
+    private <T extends Geometry> void addMultiGeometry(GeometryCollection multiGeometry, List<GeometryFeature<T>> result)
     {
         for (int i = 0; i < multiGeometry.getNumGeometries(); i++) {
             T geometry = (T) multiGeometry.getGeometryN(i);
             geometry.setUserData(multiGeometry.getUserData());
-            result.add(geometry);
+            result.add(GeometryFeature.createGeometryFeature(geometry));
         }
     }
 
@@ -369,10 +370,10 @@ public class FormatMapper<T extends Geometry>
     }
 
     @Override
-    public Iterator<T> call(Iterator<String> stringIterator)
+    public Iterator<GeometryFeature<T>> call(Iterator<String> stringIterator)
             throws Exception
     {
-        List<T> result = new ArrayList<>();
+        List<GeometryFeature<T>> result = new ArrayList<>();
         while (stringIterator.hasNext()) {
             String line = stringIterator.next();
             addGeometry(readGeometry(line), result);
@@ -380,7 +381,7 @@ public class FormatMapper<T extends Geometry>
         return result.iterator();
     }
 
-    private void addGeometry(Geometry geometry, List<T> result)
+    private void addGeometry(Geometry geometry, List<GeometryFeature<T>> result)
     {
         if (geometry == null) {
             return;
@@ -395,7 +396,7 @@ public class FormatMapper<T extends Geometry>
             addMultiGeometry((MultiPolygon) geometry, result);
         }
         else {
-            result.add((T) geometry);
+            result.add(GeometryFeature.createGeometryFeature(geometry));
         }
     }
 }
