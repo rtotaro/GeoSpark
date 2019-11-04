@@ -16,9 +16,7 @@
  */
 package org.apache.spark.sql.geosparksql.expressions
 
-import com.vividsolutions.jts.geom.PrecisionModel
-import com.vividsolutions.jts.operation.valid.IsValidOp
-import com.vividsolutions.jts.precision.GeometryPrecisionReducer
+import org.locationtech.jts.geom.PrecisionModel
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
@@ -30,8 +28,10 @@ import org.datasyslab.geosparksql.utils.GeometrySerializer
 import org.geotools.geometry.jts.JTS
 import org.geotools.referencing.CRS
 import org.opengis.referencing.operation.MathTransform
-import com.vividsolutions.jts.geom._
-import com.vividsolutions.jts.operation.IsSimpleOp
+import org.locationtech.jts.geom._
+import org.locationtech.jts.operation.IsSimpleOp
+import org.locationtech.jts.operation.valid.IsValidOp
+import org.locationtech.jts.precision.GeometryPrecisionReducer
 
 /**
   * Return the distance between two geometries.

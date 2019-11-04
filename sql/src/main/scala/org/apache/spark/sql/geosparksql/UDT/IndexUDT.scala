@@ -16,10 +16,10 @@
  */
 package org.apache.spark.sql.geosparksql.UDT
 
-import com.vividsolutions.jts.index.SpatialIndex
 import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
 import org.apache.spark.sql.types.{ArrayType, ByteType, DataType, UserDefinedType}
 import org.datasyslab.geosparksql.utils.IndexSerializer
+import org.locationtech.jts.index.SpatialIndex
 
 class IndexUDT extends UserDefinedType[SpatialIndex] {
   override def sqlType: DataType = ArrayType(ByteType, containsNull = false)

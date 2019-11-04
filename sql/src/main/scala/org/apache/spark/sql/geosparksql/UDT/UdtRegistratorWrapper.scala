@@ -16,9 +16,9 @@
  */
 package org.apache.spark.sql.geosparksql.UDT
 
-import com.vividsolutions.jts.geom.Geometry
-import com.vividsolutions.jts.index.SpatialIndex
+import org.locationtech.jts.geom.Geometry
 import org.apache.spark.sql.types.UDTRegistration
+import org.locationtech.jts.index.SpatialIndex
 
 object UdtRegistratorWrapper {
   def registerAll(): Unit = {
