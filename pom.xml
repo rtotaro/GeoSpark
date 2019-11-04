@@ -11,7 +11,7 @@
   <modules>
     <module>core</module>
     <module>sql</module>
-<!--    <module>viz</module>-->
+    <module>viz</module>
   </modules>
 
     <licenses>
