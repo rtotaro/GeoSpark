@@ -23,7 +23,7 @@ import org.locationtech.jts.geom.Geometry;
 
 class RddReader
 {
-    public static SpatialRDD<GeometryFeature> createSpatialRDD(JavaRDD rawTextRDD, FormatMapper<Geometry> formatMapper)
+    public static SpatialRDD<GeometryFeature> createSpatialRDD(JavaRDD rawTextRDD, FormatMapper<GeometryFeature> formatMapper)
     {
         SpatialRDD spatialRDD = new SpatialRDD<GeometryFeature>();
         spatialRDD.rawSpatialRDD = rawTextRDD.mapPartitions(formatMapper);

@@ -36,8 +36,8 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.*;
 
-public class FormatMapper<T extends Geometry>
-        implements Serializable, FlatMapFunction<Iterator<String>, GeometryFeature<T>>
+public class FormatMapper<T extends GeometryFeature>
+        implements Serializable, FlatMapFunction<Iterator<String>, T>
 {
 
     /**
@@ -280,12 +280,12 @@ public class FormatMapper<T extends Geometry>
         return coordinates;
     }
 
-    private <T extends Geometry> void addMultiGeometry(GeometryCollection multiGeometry, List<GeometryFeature<T>> result)
+    private <G extends Geometry> void addMultiGeometry(GeometryCollection multiGeometry, List<T> result)
     {
         for (int i = 0; i < multiGeometry.getNumGeometries(); i++) {
-            T geometry = (T) multiGeometry.getGeometryN(i);
+            G geometry = (G) multiGeometry.getGeometryN(i);
             geometry.setUserData(multiGeometry.getUserData());
-            result.add(GeometryFeature.createGeometryFeature(geometry));
+            result.add((T)GeometryFeature.createGeometryFeature(geometry));
         }
     }
 
@@ -370,10 +370,10 @@ public class FormatMapper<T extends Geometry>
     }
 
     @Override
-    public Iterator<GeometryFeature<T>> call(Iterator<String> stringIterator)
+    public Iterator<T> call(Iterator<String> stringIterator)
             throws Exception
     {
-        List<GeometryFeature<T>> result = new ArrayList<>();
+        List<T> result = new ArrayList<>();
         while (stringIterator.hasNext()) {
             String line = stringIterator.next();
             addGeometry(readGeometry(line), result);
@@ -381,7 +381,7 @@ public class FormatMapper<T extends Geometry>
         return result.iterator();
     }
 
-    private void addGeometry(Geometry geometry, List<GeometryFeature<T>> result)
+    private void addGeometry(Geometry geometry, List<T> result)
     {
         if (geometry == null) {
             return;
@@ -396,7 +396,7 @@ public class FormatMapper<T extends Geometry>
             addMultiGeometry((MultiPolygon) geometry, result);
         }
         else {
-            result.add(GeometryFeature.createGeometryFeature(geometry));
+            result.add((T)GeometryFeature.createGeometryFeature(geometry));
         }
     }
 }

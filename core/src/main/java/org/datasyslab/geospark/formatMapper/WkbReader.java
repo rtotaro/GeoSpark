@@ -36,7 +36,7 @@ public class WkbReader extends RddReader
      */
     public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath, int wkbColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         JavaRDD rawTextRDD = sc.textFile(inputPath);
-        FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
+        FormatMapper<GeometryFeature> formatMapper = new FormatMapper<GeometryFeature>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;
         return createSpatialRDD(rawTextRDD, formatMapper);
@@ -51,7 +51,7 @@ public class WkbReader extends RddReader
      * @return
      */
     public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaRDD rawTextRDD, int wkbColumn, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
-        FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
+        FormatMapper<GeometryFeature> formatMapper = new FormatMapper<GeometryFeature>(wkbColumn, -1, FileDataSplitter.WKB, true, null);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;
         return createSpatialRDD(rawTextRDD, formatMapper);

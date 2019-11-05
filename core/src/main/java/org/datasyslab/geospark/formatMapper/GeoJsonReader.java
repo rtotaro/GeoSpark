@@ -46,7 +46,7 @@ public class GeoJsonReader extends RddReader
      */
     public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
         JavaRDD rawTextRDD = sc.textFile(inputPath);
-        FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(FileDataSplitter.GEOJSON, true);
+        FormatMapper<GeometryFeature> formatMapper = new FormatMapper<GeometryFeature>(FileDataSplitter.GEOJSON, true);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;
         return createSpatialRDD(rawTextRDD, formatMapper);
@@ -69,7 +69,7 @@ public class GeoJsonReader extends RddReader
      * @return
      */
     public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaRDD rawTextRDD, boolean allowInvalidGeometries, boolean skipSyntacticallyInvalidGeometries) {
-        FormatMapper<Geometry> formatMapper = new FormatMapper<Geometry>(FileDataSplitter.GEOJSON, true);
+        FormatMapper<GeometryFeature> formatMapper = new FormatMapper<GeometryFeature>(FileDataSplitter.GEOJSON, true);
         formatMapper.allowTopologicallyInvalidGeometries = allowInvalidGeometries;
         formatMapper.skipSyntacticallyInvalidGeometries = skipSyntacticallyInvalidGeometries;
         return createSpatialRDD(rawTextRDD, formatMapper);

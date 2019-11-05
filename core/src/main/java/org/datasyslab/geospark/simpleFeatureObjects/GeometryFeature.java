@@ -119,25 +119,29 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
 
     public static GeometryFeature createGeometryFeature(Geometry geom, String featureId) {
         SimpleFeature simpleFeature = createSimpleFeature(geom, featureId);
+        GeometryFeature result = null;
         if (geom instanceof Point) {
             Point point = (Point) geom;
-            return PointFeature.createFeature(simpleFeature);
+            result = PointFeature.createFeature(simpleFeature);
         } else if (geom instanceof Polygon) {
             Polygon polygon = (Polygon) geom;
-            return PolygonFeature.createFeature(simpleFeature);
+            result = PolygonFeature.createFeature(simpleFeature);
 
         } else if (geom instanceof LineString) {
             LineString lineS = (LineString) geom;
-            return LineStringFeature.createFeature(simpleFeature);
+            result = LineStringFeature.createFeature(simpleFeature);
 
         } else if (geom instanceof Circle) {
             Circle circle = (Circle) geom;
-            return CircleFeature.createFeature(simpleFeature);
+            result = CircleFeature.createFeature(simpleFeature);
 
         } else {
             throw new IllegalArgumentException("Unsupported geometry:" + geom.getClass().toString());
 
         }
+
+        result.setGeomData(geom.getUserData());
+        return result;
     }
 
 
@@ -173,7 +177,7 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
 
-        String encodeFeature = DataUtilities.encodeFeature(this,true);
+        String encodeFeature = DataUtilities.encodeFeature(this.delegate,true);
         aOutputStream.write(encodeFeature.getBytes());
     }
 

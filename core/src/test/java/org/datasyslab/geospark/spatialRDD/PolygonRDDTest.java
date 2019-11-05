@@ -102,8 +102,8 @@ public class PolygonRDDTest
         PolygonRDD spatialRDD = new PolygonRDD(sc, InputLocationGeojson, FileDataSplitter.GEOJSON, true, 4, StorageLevel.MEMORY_ONLY());
         assert spatialRDD.approximateTotalCount == 1001;
         assert spatialRDD.boundaryEnvelope != null;
-        assertEquals(spatialRDD.rawSpatialRDD.take(1).get(0).getUserData(), "01\t077\t011501\t5\t1500000US010770115015\t010770115015\t5\tBG\t6844991\t32636");
-        assertEquals(spatialRDD.rawSpatialRDD.take(2).get(1).getUserData(), "01\t045\t021102\t4\t1500000US010450211024\t010450211024\t4\tBG\t11360854\t0");
+        assertEquals(spatialRDD.rawSpatialRDD.take(1).get(0).getGeomData(), "01\t077\t011501\t5\t1500000US010770115015\t010770115015\t5\tBG\t6844991\t32636");
+        assertEquals(spatialRDD.rawSpatialRDD.take(2).get(1).getGeomData(), "01\t045\t021102\t4\t1500000US010450211024\t010450211024\t4\tBG\t11360854\t0");
         assertEquals(spatialRDD.fieldNames.toString(), "[STATEFP, COUNTYFP, TRACTCE, BLKGRPCE, AFFGEOID, GEOID, NAME, LSAD, ALAND, AWATER]");
     }
 
@@ -113,7 +113,7 @@ public class PolygonRDDTest
         PolygonRDD spatialRDD = new PolygonRDD(sc, InputLocationWkt, FileDataSplitter.WKT, true, StorageLevel.MEMORY_ONLY());
         assert spatialRDD.approximateTotalCount == 103;
         assert spatialRDD.boundaryEnvelope != null;
-        assert spatialRDD.rawSpatialRDD.take(1).get(0).getUserData().equals("31\t039\t00835841\t31039\tCuming\tCuming County\t06\tH1\tG4020\t\t\t\tA\t1477895811\t10447360\t+41.9158651\t-096.7885168");
+        assert spatialRDD.rawSpatialRDD.take(1).get(0).getGeomData().equals("31\t039\t00835841\t31039\tCuming\tCuming County\t06\tH1\tG4020\t\t\t\tA\t1477895811\t10447360\t+41.9158651\t-096.7885168");
     }
 
     @Test
@@ -122,7 +122,7 @@ public class PolygonRDDTest
         PolygonRDD spatialRDD = new PolygonRDD(sc, InputLocationWkb, FileDataSplitter.WKB, true, StorageLevel.MEMORY_ONLY());
         assert spatialRDD.approximateTotalCount == 103;
         assert spatialRDD.boundaryEnvelope != null;
-        assert spatialRDD.rawSpatialRDD.take(1).get(0).getUserData().equals("31\t039\t00835841\t31039\tCuming\tCuming County\t06\tH1\tG4020\t\t\t\tA\t1477895811\t10447360\t+41.9158651\t-096.7885168");
+        assert spatialRDD.rawSpatialRDD.take(1).get(0).getGeomData().equals("31\t039\t00835841\t31039\tCuming\tCuming County\t06\tH1\tG4020\t\t\t\tA\t1477895811\t10447360\t+41.9158651\t-096.7885168");
     }
 
     /**
