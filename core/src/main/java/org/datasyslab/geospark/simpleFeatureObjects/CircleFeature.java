@@ -38,18 +38,5 @@ public class CircleFeature extends GeometryFeature<Circle> implements Serializab
 
     }
 
-    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-        int available = aInputStream.available();
-        byte[] bytes = new byte[available];
-        aInputStream.read(bytes,0,available);
-        SimpleFeature feature = DataUtilities.createFeature(geometryFeatureType, new String(bytes));
-        super.delegate = feature;
 
-    }
-
-    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
-
-        String encodeFeature = DataUtilities.encodeFeature(this,true);
-        aOutputStream.write(encodeFeature.getBytes());
-    }
 }

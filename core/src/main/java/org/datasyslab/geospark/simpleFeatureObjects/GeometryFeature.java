@@ -27,6 +27,10 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
 
     protected GeometryFeature(SimpleFeature delegate) {
         super(delegate);
+        if(delegate==null)
+        {
+            throw new IllegalArgumentException("DelegateFeature cannot be null");
+        }
         setGeomData(getDefaultGeometry().getUserData());
     }
 
@@ -166,19 +170,19 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
     }
 
 
-    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-        int available = aInputStream.available();
-        byte[] bytes = new byte[available];
-        aInputStream.read(bytes,0,available);
-        SimpleFeature feature = DataUtilities.createFeature(geometryFeatureType, new String(bytes));
-        super.delegate = feature;
 
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+        String stringSerialization = (String)aInputStream.readObject();
+        SimpleFeature feature = DataUtilities.createFeature(geometryFeatureType, stringSerialization);
+        super.delegate = feature;
+        setGeomData(getDefaultGeometry().getUserData());
     }
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
 
-        String encodeFeature = DataUtilities.encodeFeature(this.delegate,true);
-        aOutputStream.write(encodeFeature.getBytes());
+        String stringSerialization = DataUtilities.encodeFeature(this.delegate,true);
+
+        aOutputStream.writeObject(stringSerialization);
     }
 
 
