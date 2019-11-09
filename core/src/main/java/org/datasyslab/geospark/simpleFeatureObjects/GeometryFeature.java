@@ -19,19 +19,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeature implements Serializable {
 
     protected GeometryFeature(SimpleFeature delegate) {
         super(delegate);
-        if(delegate==null)
-        {
+        if (delegate == null) {
             throw new IllegalArgumentException("DelegateFeature cannot be null");
         }
-        setGeomData(getDefaultGeometry().getUserData());
+        Object userData = ((Geometry) delegate.getDefaultGeometry()).getUserData();
+        setGeomData(userData);
     }
 
     public static SimpleFeatureType geometryFeatureType;
@@ -121,6 +120,23 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
         return createGeometryFeature(geom, UUID.randomUUID().toString());
     }
 
+    public static List<GeometryFeature> createGeometryFeatures(Geometry geom) {
+
+        List<GeometryFeature> result = new ArrayList<>();
+
+        if (geom instanceof GeometryCollection) {
+            GeometryCollection multiObjects = (GeometryCollection) geom;
+            for (int i = 0; i < multiObjects.getNumGeometries(); i++) {
+                Geometry oneObject = (Geometry) multiObjects.getGeometryN(i);
+                oneObject.setUserData(multiObjects.getUserData());
+                result.add(createGeometryFeature(oneObject));
+            }
+        } else {
+            result.add(createGeometryFeature(geom));
+        }
+        return result;
+    }
+
     public static GeometryFeature createGeometryFeature(Geometry geom, String featureId) {
         SimpleFeature simpleFeature = createSimpleFeature(geom, featureId);
         GeometryFeature result = null;
@@ -170,23 +186,19 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
     }
 
 
-
     private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-        String stringSerialization = (String)aInputStream.readObject();
+        String stringSerialization = (String) aInputStream.readObject();
         SimpleFeature feature = DataUtilities.createFeature(geometryFeatureType, stringSerialization);
         super.delegate = feature;
-        setGeomData(getDefaultGeometry().getUserData());
+        this.getUserData().putAll((Map<?, ?>) aInputStream.readObject());
     }
 
     private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
 
-        String stringSerialization = DataUtilities.encodeFeature(this.delegate,true);
-
+        String stringSerialization = DataUtilities.encodeFeature(this.delegate, true);
         aOutputStream.writeObject(stringSerialization);
+        aOutputStream.writeObject(this.getUserData());
     }
-
-
-
 
 
 }

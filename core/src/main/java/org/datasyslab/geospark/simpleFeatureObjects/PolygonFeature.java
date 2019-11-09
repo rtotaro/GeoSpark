@@ -19,9 +19,9 @@ public class PolygonFeature extends GeometryFeature<Polygon> implements Serializ
         super(delegate);
     }
 
-    public static PolygonFeature createFeature(SimpleFeature feature, Polygon point)
+    public static PolygonFeature createFeature(SimpleFeature feature, Polygon polygon)
     {
-        feature.setDefaultGeometry(point);
+        feature.setDefaultGeometry(polygon);
         return new PolygonFeature(feature);
     }
 
@@ -30,7 +30,6 @@ public class PolygonFeature extends GeometryFeature<Polygon> implements Serializ
         Object defaultGeometry = feature.getDefaultGeometry();
         if(defaultGeometry instanceof Polygon)
         {
-            feature.setDefaultGeometry(defaultGeometry);
             return new PolygonFeature(feature);
         }
 

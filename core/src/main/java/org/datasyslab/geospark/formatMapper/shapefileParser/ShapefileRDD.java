@@ -29,12 +29,16 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.TypeU
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
 import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.io.WKTWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import scala.Tuple2;
@@ -164,14 +168,11 @@ public class ShapefileRDD
                 }
                 return result.iterator();
             }
-        }).map(v1 -> PointFeature.createFeature(createSimpleFeature(v1.toText()),v1));
+        }).map(v1 -> PointFeature.createFeature(createSimpleFeature(v1)));
     }
 
-    private SimpleFeature createSimpleFeature(String wkt) {
-        SimpleFeatureTypeBuilder simpleFeatureTypeBuilder = new SimpleFeatureTypeBuilder();
-        simpleFeatureTypeBuilder.add("WKT",String.class);
-        SimpleFeatureType geomFeatureType = simpleFeatureTypeBuilder.buildFeatureType();
-        SimpleFeature simpleFeature = SimpleFeatureBuilder.build(geomFeatureType, Arrays.asList(wkt), UUID.randomUUID().toString());
+    private SimpleFeature createSimpleFeature(Geometry geometry) {
+        SimpleFeature simpleFeature = SimpleFeatureBuilder.build(GeometryFeature.geometryFeatureType, Arrays.asList(geometry.toText(),geometry), UUID.randomUUID().toString());
         return simpleFeature;
     }
 
@@ -205,7 +206,7 @@ public class ShapefileRDD
                 }
                 return result.iterator();
             }
-        }).map(v1 -> PolygonFeature.createFeature(createSimpleFeature(v1.toText()),v1));
+        }).map(v1 -> PolygonFeature.createFeature(createSimpleFeature(v1)));
     }
 
     /**
@@ -238,7 +239,7 @@ public class ShapefileRDD
                 }
                 return result.iterator();
             }
-        }).map(v1 -> LineStringFeature.createFeature(createSimpleFeature(v1.toText()),v1));
+        }).map(v1 -> LineStringFeature.createFeature(createSimpleFeature(v1)));
     }
 
     /**

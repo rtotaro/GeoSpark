@@ -332,7 +332,7 @@ public class ShapefileRDDTest
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        assert ((PolygonFeature) spatialRDD.rawSpatialRDD.take(1).get(0)).getUserData().equals("20\t175\t00485050\t0500000US20175\t20175\tSeward\t06\t1655865960\t2777350");
+        assert ((PolygonFeature) spatialRDD.rawSpatialRDD.take(1).get(0)).getGeomData().equals("20\t175\t00485050\t0500000US20175\t20175\tSeward\t06\t1655865960\t2777350");
         for (Geometry geometry : shapefileRDD.getShapeRDD().collect()) {
             Assert.assertEquals(featureIterator.next(), geometry.toText());
         }
