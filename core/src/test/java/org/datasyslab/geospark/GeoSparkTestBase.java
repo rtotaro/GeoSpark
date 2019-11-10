@@ -41,8 +41,8 @@ public class GeoSparkTestBase
     protected static void initialize(final String testSuiteName)
     {
         conf = new SparkConf().setAppName(testSuiteName).setMaster("local[2]");
-        conf.set("spark.serializer", KryoSerializer.class.getName());
-        conf.set("spark.kryo.registrator", GeoSparkKryoRegistrator.class.getName());
+//        conf.set("spark.serializer", KryoSerializer.class.getName());
+//        conf.set("spark.kryo.registrator", GeoSparkKryoRegistrator.class.getName());
 
         sc = new JavaSparkContext(conf);
         Logger.getLogger("org").setLevel(Level.WARN);

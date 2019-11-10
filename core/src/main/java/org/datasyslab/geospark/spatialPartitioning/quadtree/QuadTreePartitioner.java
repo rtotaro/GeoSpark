@@ -22,11 +22,8 @@ import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
 import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.spatialPartitioning.SpatialPartitioner;
 import org.datasyslab.geospark.utils.HalfOpenRectangle;
-import org.datasyslab.geospark.utils.SimpleFeatureUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeature;
 import scala.Tuple2;
 
 import javax.annotation.Nullable;
@@ -53,7 +50,7 @@ public class QuadTreePartitioner
     {
         Objects.requireNonNull(spatialObject, "spatialObject");
 
-        final Envelope envelope = SimpleFeatureUtils.getEnvelopeInternal(spatialObject);
+        final Envelope envelope = spatialObject.getEnvelopeInternal();
 
         final List<QuadRectangle> matchedPartitions = quadTree.findZones(new QuadRectangle(envelope));
 

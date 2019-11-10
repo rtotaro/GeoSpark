@@ -16,6 +16,8 @@
  */
 package org.datasyslab.geospark.simpleFeatureObjects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
 import org.locationtech.jts.geom.Geometry;
@@ -183,14 +185,6 @@ public class DecoratingFeature implements SimpleFeature, Serializable {
         delegate.setValue(arg0);
     }
 
-    public boolean equals(Object obj) {
-        return delegate.equals(obj);
-    }
-
-    public int hashCode() {
-        return delegate.hashCode();
-    }
-
     public String toString() {
         return "<" + getClass().getCanonicalName() + ">" + delegate.toString();
     }
@@ -213,5 +207,25 @@ public class DecoratingFeature implements SimpleFeature, Serializable {
         aOutputStream.writeObject(DataUtilities.encodeType(this.delegate.getFeatureType()));
         aOutputStream.writeObject( DataUtilities.encodeFeature(this.delegate, true));
         aOutputStream.writeObject(this.delegate.getUserData());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DecoratingFeature that = (DecoratingFeature) o;
+
+        return new EqualsBuilder()
+                .append(delegate, that.delegate)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(delegate)
+                .toHashCode();
     }
 }
