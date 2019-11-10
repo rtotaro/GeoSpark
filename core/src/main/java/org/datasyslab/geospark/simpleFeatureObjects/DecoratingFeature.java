@@ -16,6 +16,8 @@
  */
 package org.datasyslab.geospark.simpleFeatureObjects;
 
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.SchemaException;
 import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.IllegalAttributeException;
@@ -27,8 +29,12 @@ import org.opengis.feature.type.Name;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.geometry.BoundingBox;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -191,5 +197,21 @@ public class DecoratingFeature implements SimpleFeature, Serializable {
 
     public void validate() {
         delegate.validate();
+    }
+
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException, SchemaException {
+        String sftName = (String) aInputStream.readObject();
+        String sftSpec = (String) aInputStream.readObject();
+        SimpleFeatureType geometryFeatureType = DataUtilities.createType(sftName,sftSpec);
+        SimpleFeature feature = DataUtilities.createFeature(geometryFeatureType, (String) aInputStream.readObject());
+        this.delegate = feature;
+        this.getUserData().putAll((Map<?, ?>) aInputStream.readObject());
+    }
+
+    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
+        aOutputStream.writeObject(this.delegate.getFeatureType().getTypeName());
+        aOutputStream.writeObject(DataUtilities.encodeType(this.delegate.getFeatureType()));
+        aOutputStream.writeObject( DataUtilities.encodeFeature(this.delegate, true));
+        aOutputStream.writeObject(this.delegate.getUserData());
     }
 }

@@ -26,10 +26,7 @@
 package org.datasyslab.geospark.spatialOperator;
 
 import org.apache.spark.storage.StorageLevel;
-import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -229,7 +226,7 @@ public class JoinQueryCorrectnessChecker
     private static <T extends Geometry> GeometryFeature<T> wrap(T geometry, Object userData)
     {
         geometry.setUserData(userData);
-        return GeometryFeature.createGeometryFeature(geometry);
+        return GeometryFeatureFactory.createGeometryFeature(geometry);
     }
 
     private <T extends GeometryFeature, U extends GeometryFeature> void prepareRDDs(SpatialRDD<T> objectRDD,

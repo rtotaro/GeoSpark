@@ -28,18 +28,12 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.fieldname.FieldnameI
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
-import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.*;
 import org.datasyslab.geospark.spatialRDD.LineStringRDD;
 import org.datasyslab.geospark.spatialRDD.PointRDD;
 import org.datasyslab.geospark.spatialRDD.PolygonRDD;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Polygon;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -71,7 +65,7 @@ public class ShapefileReader {
      */
     public static SpatialRDD<GeometryFeature> readToGeometryRDD(JavaSparkContext sc, String inputPath, final GeometryFactory geometryFactory) {
         SpatialRDD<GeometryFeature> spatialRDD = new SpatialRDD();
-        spatialRDD.rawSpatialRDD = readShapefile(sc, inputPath, geometryFactory).flatMap(geometryFeatures -> geometryFeatures.iterator());
+        spatialRDD.rawSpatialRDD = readShapefile(sc, inputPath, geometryFactory);
         try {
             spatialRDD.fieldNames = readFieldNames(sc, inputPath);
         } catch (IOException e) {
@@ -88,7 +82,7 @@ public class ShapefileReader {
      * @param geometryFactory
      * @return
      */
-    private static JavaRDD<List<GeometryFeature>> readShapefile(
+    private static JavaRDD<GeometryFeature> readShapefile(
             JavaSparkContext sc,
             String inputPath,
             final GeometryFactory geometryFactory
@@ -100,12 +94,12 @@ public class ShapefileReader {
                 PrimitiveShape.class,
                 sc.hadoopConfiguration()
         );
-        return shapePrimitiveRdd.map(new Function<Tuple2<ShapeKey, PrimitiveShape>, List<GeometryFeature>>() {
+        return shapePrimitiveRdd.map(new Function<Tuple2<ShapeKey, PrimitiveShape>, GeometryFeature>() {
             @Override
-            public List<GeometryFeature> call(Tuple2<ShapeKey, PrimitiveShape> primitiveTuple)
+            public GeometryFeature call(Tuple2<ShapeKey, PrimitiveShape> primitiveTuple)
                     throws Exception {
                 // parse bytes to shape
-                return GeometryFeature.createGeometryFeatures(primitiveTuple._2().getShape(geometryFactory));
+                return GeometryFeatureFactory.createGeometryFeature(primitiveTuple._2().getShape(geometryFactory));
             }
         });
     }
@@ -214,7 +208,7 @@ public class ShapefileReader {
      * @return
      */
     public static PolygonRDD geometryToPolygon(SpatialRDD geometryRDD) {
-        PolygonRDD polygonRDD = new PolygonRDD(geometryRDD.rawSpatialRDD.flatMap(new FlaTMapFeatures(PolygonFeature.class)));
+        PolygonRDD polygonRDD = new PolygonRDD(geometryRDD.rawSpatialRDD.flatMap(new FlatMapFeatures(PolygonFeature.class)));
         polygonRDD.fieldNames = geometryRDD.fieldNames;
         return polygonRDD;
     }
@@ -250,7 +244,7 @@ public class ShapefileReader {
      */
     public static PointRDD geometryToPoint(SpatialRDD geometryRDD) {
         PointRDD pointRDD = new PointRDD(
-                geometryRDD.rawSpatialRDD.flatMap(new FlaTMapFeatures(PointFeature.class)));
+                geometryRDD.rawSpatialRDD.flatMap(new FlatMapFeatures(PointFeature.class)));
         pointRDD.fieldNames = geometryRDD.fieldNames;
         return pointRDD;
     }
@@ -286,17 +280,17 @@ public class ShapefileReader {
      */
     public static LineStringRDD geometryToLineString(SpatialRDD geometryRDD) {
         LineStringRDD lineStringRDD = new LineStringRDD(
-                geometryRDD.rawSpatialRDD.flatMap(new FlaTMapFeatures(LineStringFeature.class)));
+                geometryRDD.rawSpatialRDD.flatMap(new FlatMapFeatures(LineStringFeature.class)));
         lineStringRDD.fieldNames = geometryRDD.fieldNames;
         return lineStringRDD;
     }
 
 
-    private static class FlaTMapFeatures<T extends GeometryFeature> implements FlatMapFunction<GeometryFeature,T>{
+    private static class FlatMapFeatures<T extends GeometryFeature> implements FlatMapFunction<GeometryFeature, T> {
 
         private Class<T> clazz;
 
-        public FlaTMapFeatures(Class<T> clazz) {
+        public FlatMapFeatures(Class<T> clazz) {
             this.clazz = clazz;
         }
 
@@ -305,6 +299,8 @@ public class ShapefileReader {
             List<T> result = new ArrayList<T>();
             if (clazz.isAssignableFrom(geometryFeature.getClass())) {
                 result.add((T) geometryFeature);
+            } else if (geometryFeature instanceof GeometryCollectionFeature) {
+                result.addAll(((GeometryCollectionFeature)geometryFeature).toSingleFeatures());
             } else {
                 throw new Exception("[ShapefileRDD][getPointRDD] the object type is not Point or MultiPoint type. It is " + geometryFeature.getDefaultGeometry().getGeometryType());
             }

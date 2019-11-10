@@ -18,6 +18,7 @@ package org.datasyslab.geospark.knnJudgement;
 
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeatureFactory;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.GeometryItemDistance;
@@ -77,7 +78,7 @@ public class KnnJudgementUsingIndex<U extends Geometry, T extends GeometryFeatur
         SpatialIndex treeIndex = treeIndexes.next();
         final Object[] localK;
         if (treeIndex instanceof STRtree) {
-            localK = ((STRtree) treeIndex).nearestNeighbour(queryCenter.getEnvelopeInternal(), GeometryFeature.createGeometryFeature(queryCenter, featureId), new ItemDistance() {
+            localK = ((STRtree) treeIndex).nearestNeighbour(queryCenter.getEnvelopeInternal(), GeometryFeatureFactory.createGeometryFeature(queryCenter, featureId), new ItemDistance() {
                 @Override
                 public double distance(ItemBoundable item1, ItemBoundable item2) {
                     GeometryFeature f1 = (GeometryFeature) item1.getItem();

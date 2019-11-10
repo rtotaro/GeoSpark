@@ -22,27 +22,23 @@ import org.apache.spark.serializer.KryoRegistrator;
 import org.datasyslab.geospark.geometryObjects.Circle;
 import org.datasyslab.geospark.geometryObjects.GeometrySerde;
 import org.datasyslab.geospark.geometryObjects.JavaSpatialIndexSerde;
-import org.locationtech.geomesa.features.kryo.KryoFeatureSerializer;
-import org.locationtech.geomesa.features.kryo.KryoFeatureSerializer$;
-import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator;
+import org.datasyslab.geospark.simpleFeatureObjects.*;
+import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.quadtree.Quadtree;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opengis.feature.simple.SimpleFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //import org.datasyslab.geospark.geometryObjects.SpatialIndexSerde;
 
 public class GeoSparkKryoRegistrator
-        implements KryoRegistrator
-{
+        implements KryoRegistrator {
 
     final static Logger log = LoggerFactory.getLogger(GeoSparkKryoRegistrator.class);
 
     @Override
-    public void registerClasses(Kryo kryo)
-    {
+    public void registerClasses(Kryo kryo) {
         GeometrySerde serializer = new GeometrySerde();
 //        SpatialIndexSerde indexSerializer = new SpatialIndexSerde(serializer);
 
@@ -61,7 +57,17 @@ public class GeoSparkKryoRegistrator
         kryo.register(Quadtree.class, new JavaSpatialIndexSerde());
         kryo.register(STRtree.class, new JavaSpatialIndexSerde());
 
-        new GeoMesaSparkKryoRegistrator().registerClasses(kryo);
+        kryo.register(GeometryFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(SimpleFeatureImpl.class, new JavaSpatialIndexSerde());
+        kryo.register(PointFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(DecoratingFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(PolygonFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(LineStringFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(CircleFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(RectangleFeature.class, new JavaSpatialIndexSerde());
+        kryo.register(GeometryCollectionFeature.class, new JavaSpatialIndexSerde());
+
+//        new GeoMesaSparkKryoRegistrator().registerClasses(kryo);
 
     }
 }

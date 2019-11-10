@@ -20,6 +20,7 @@ import org.apache.spark.api.java.function.FlatMapFunction;
 import org.datasyslab.geospark.enums.FileDataSplitter;
 import org.datasyslab.geospark.enums.GeometryType;
 import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeatureFactory;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
@@ -285,7 +286,7 @@ public class FormatMapper<T extends GeometryFeature>
         for (int i = 0; i < multiGeometry.getNumGeometries(); i++) {
             G geometry = (G) multiGeometry.getGeometryN(i);
             geometry.setUserData(multiGeometry.getUserData());
-            result.add((T)GeometryFeature.createGeometryFeature(geometry));
+            result.add((T) GeometryFeatureFactory.createGeometryFeature(geometry));
         }
     }
 
@@ -396,7 +397,7 @@ public class FormatMapper<T extends GeometryFeature>
             addMultiGeometry((MultiPolygon) geometry, result);
         }
         else {
-            result.add((T)GeometryFeature.createGeometryFeature(geometry));
+            result.add((T)GeometryFeatureFactory.createGeometryFeature(geometry));
         }
     }
 }

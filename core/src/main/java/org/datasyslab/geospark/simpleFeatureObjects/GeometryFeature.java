@@ -1,25 +1,14 @@
 package org.datasyslab.geospark.simpleFeatureObjects;
 
 import org.datasyslab.geospark.geometryObjects.Circle;
-import org.geotools.data.DataUtilities;
-import org.geotools.feature.AttributeTypeBuilder;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTS;
-import org.locationtech.geomesa.features.kryo.serialization.SimpleFeatureSerializer;
 import org.locationtech.jts.geom.*;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import scala.collection.immutable.HashSet;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.*;
 import java.util.function.Function;
 
 public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeature implements Serializable {
@@ -31,27 +20,6 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
         }
         Object userData = ((Geometry) delegate.getDefaultGeometry()).getUserData();
         setGeomData(userData);
-    }
-
-    public static SimpleFeatureType geometryFeatureType;
-
-    public static SimpleFeatureSerializer serializer;
-
-    static {
-        SimpleFeatureTypeBuilder simpleFeatureTypeBuilder = new SimpleFeatureTypeBuilder();
-        simpleFeatureTypeBuilder.setName("GeometryFeature");
-        simpleFeatureTypeBuilder.setDefaultGeometry("geom");
-
-        AttributeTypeBuilder attributeTypeBuilder = new AttributeTypeBuilder().binding(String.class);
-        attributeTypeBuilder.setName("wkt");
-
-        AttributeTypeBuilder geomAttributeBuilder = new AttributeTypeBuilder().binding(Geometry.class);
-        attributeTypeBuilder.setName("geom");
-
-        simpleFeatureTypeBuilder.addAll(new AttributeDescriptor[]{attributeTypeBuilder.buildDescriptor("wkt"), geomAttributeBuilder.buildDescriptor("geom")});
-        geometryFeatureType = simpleFeatureTypeBuilder.buildFeatureType();
-
-        serializer = new SimpleFeatureSerializer(geometryFeatureType, new HashSet<>());
     }
 
     public T getDefaultGeometry() {
@@ -85,7 +53,7 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
         return this.getDefaultGeometry().intersects(geometryFeature.getDefaultGeometry());
     }
 
-    private void setGeomData(Object geomData) {
+    void setGeomData(Object geomData) {
         getUserData().put("geomData", geomData);
     }
 
@@ -109,96 +77,17 @@ public abstract class GeometryFeature<T extends Geometry> extends DecoratingFeat
         } else if (geom instanceof Circle) {
             Circle circle = (Circle) geom;
             return CircleFeature.createFeature(sf);
+        }
+        else if (geom instanceof GeometryCollection) {
+            GeometryCollection geometryCollection = (GeometryCollection) geom;
+            return GeometryCollectionFeature.createFeature(sf);
 
-        } else {
+        }else {
             throw new IllegalArgumentException("Unsupported geometry:" + geom.getClass().toString());
 
         }
     }
 
-    public static GeometryFeature createGeometryFeature(Geometry geom) {
-        return createGeometryFeature(geom, UUID.randomUUID().toString());
-    }
-
-    public static List<GeometryFeature> createGeometryFeatures(Geometry geom) {
-
-        List<GeometryFeature> result = new ArrayList<>();
-
-        if (geom instanceof GeometryCollection) {
-            GeometryCollection multiObjects = (GeometryCollection) geom;
-            for (int i = 0; i < multiObjects.getNumGeometries(); i++) {
-                Geometry oneObject = (Geometry) multiObjects.getGeometryN(i);
-                oneObject.setUserData(multiObjects.getUserData());
-                result.add(createGeometryFeature(oneObject));
-            }
-        } else {
-            result.add(createGeometryFeature(geom));
-        }
-        return result;
-    }
-
-    public static GeometryFeature createGeometryFeature(Geometry geom, String featureId) {
-        SimpleFeature simpleFeature = createSimpleFeature(geom, featureId);
-        GeometryFeature result = null;
-        if (geom instanceof Point) {
-            Point point = (Point) geom;
-            result = PointFeature.createFeature(simpleFeature);
-        } else if (geom instanceof Polygon) {
-            Polygon polygon = (Polygon) geom;
-            result = PolygonFeature.createFeature(simpleFeature);
-
-        } else if (geom instanceof LineString) {
-            LineString lineS = (LineString) geom;
-            result = LineStringFeature.createFeature(simpleFeature);
-
-        } else if (geom instanceof Circle) {
-            Circle circle = (Circle) geom;
-            result = CircleFeature.createFeature(simpleFeature);
-
-        } else {
-            throw new IllegalArgumentException("Unsupported geometry:" + geom.getClass().toString());
-
-        }
-
-        result.setGeomData(geom.getUserData());
-        return result;
-    }
-
-
-    private static SimpleFeature createSimpleFeature(Geometry geometry, String id) {
-
-        String wkt = null;
-        if (geometry instanceof Circle) {
-            Circle circle = (Circle) geometry;
-            Point point = circle.getCentroid();
-            wkt = point.buffer(circle.getRadius()).toText();
-        } else {
-            wkt = geometry.toText();
-        }
-
-        SimpleFeature simpleFeature = SimpleFeatureBuilder.build(geometryFeatureType, Arrays.asList(wkt, geometry), UUID.randomUUID().toString());
-        return simpleFeature;
-    }
-
-    private static SimpleFeature createSimpleFeature(Geometry geometry) {
-
-        return createSimpleFeature(geometry, UUID.randomUUID().toString());
-    }
-
-
-    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
-        String stringSerialization = (String) aInputStream.readObject();
-        SimpleFeature feature = DataUtilities.createFeature(geometryFeatureType, stringSerialization);
-        super.delegate = feature;
-        this.getUserData().putAll((Map<?, ?>) aInputStream.readObject());
-    }
-
-    private void writeObject(ObjectOutputStream aOutputStream) throws IOException {
-
-        String stringSerialization = DataUtilities.encodeFeature(this.delegate, true);
-        aOutputStream.writeObject(stringSerialization);
-        aOutputStream.writeObject(this.getUserData());
-    }
 
 
 }

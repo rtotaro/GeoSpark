@@ -26,6 +26,7 @@ import org.datasyslab.geospark.enums.IndexType;
 import org.datasyslab.geospark.formatMapper.shapefileParser.ShapefileRDD;
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator;
 import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeatureFactory;
 import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.spatialOperator.JoinQuery;
 import org.datasyslab.geospark.spatialOperator.KNNQuery;
@@ -170,7 +171,7 @@ public class Example
         PolygonRDDEndOffset = 8;
 
         geometryFactory = new GeometryFactory();
-        kNNQueryPoint = (PointFeature) GeometryFeature.createGeometryFeature(geometryFactory.createPoint(new Coordinate(-84.01, 34.01)));
+        kNNQueryPoint = (PointFeature) GeometryFeatureFactory.createGeometryFeature(geometryFactory.createPoint(new Coordinate(-84.01, 34.01)));
         rangeQueryWindow = new Envelope(-90.01, -80.01, 30.01, 40.01);
         joinQueryPartitioningType = GridType.QUADTREE;
         eachQueryLoopTimes = 5;

@@ -71,8 +71,8 @@ public class CircleRDD
 
             public CircleFeature call(GeometryFeature v1)
             {
-
-                return (CircleFeature) GeometryFeature.createGeometryFeature(new Circle( v1.getDefaultGeometry(), radius));
+                //TODO:use radius
+                return (CircleFeature) GeometryFeature.createGeometryFeature(v1);
             }
         });
         this.CRStransformation = spatialRDD.CRStransformation;

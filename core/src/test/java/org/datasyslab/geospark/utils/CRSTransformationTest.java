@@ -32,6 +32,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator;
 import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeatureFactory;
 import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
 import org.junit.AfterClass;
@@ -188,7 +189,7 @@ public class CRSTransformationTest
             }
         }
 
-        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(34.01, -84.01)));
+        queryPoint = (PointFeature) GeometryFeatureFactory.createGeometryFeature(fact.createPoint(new Coordinate(34.01, -84.01)));
         topK = 100;
     }
 

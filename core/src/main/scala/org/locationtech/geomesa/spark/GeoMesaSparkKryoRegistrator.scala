@@ -34,26 +34,27 @@ class GeoMesaSparkKryoRegistrator extends KryoRegistrator {
       val cache = new ConcurrentHashMap[Int, SimpleFeatureSerializer]()
 
       override def write(kryo: Kryo, out: Output, feature: SimpleFeature): Unit = {
-        var serializer = GeometryFeature.serializer
-        out.writeInt(GeometryFeature.geometryFeatureType.hashCode(), true)
-        serializer.write(kryo, out, feature)
+//        var serializer = GeometryFeature.serializer
+//        out.writeInt(GeometryFeature.geometryFeatureType.hashCode(), true)
+//        serializer.write(kryo, out, feature)
       }
 
-      override def read(kryo: Kryo, in: Input, clazz: Class[SimpleFeature]): SimpleFeature = {
-        val id = in.readInt(true)
-        var serializer = GeometryFeature.serializer
-        GeometryFeature.createGeometryFeature(serializer.read(kryo, in, clazz))
-      }
+      override def read(kryo: Kryo, in: Input, clazz: Class[SimpleFeature]): SimpleFeature = ???
+//      {
+//        val id = in.readInt(true)
+//        var serializer = GeometryFeature.serializer
+//        GeometryFeature.createGeometryFeature(serializer.read(kryo, in, clazz))
+//      }
     }
 //    kryo.setReferences(false)
 //    SimpleFeatureSerializers.simpleFeatureImpls.foreach(kryo.register(_, serializer, kryo.getNextRegistrationId))
-    kryo.register(classOf[GeometryFeature[_]], serializer, kryo.getNextRegistrationId)
-    kryo.register(classOf[SimpleFeatureImpl], serializer, kryo.getNextRegistrationId)
-    kryo.register(classOf[PointFeature], serializer, kryo.getNextRegistrationId)
-    kryo.register(classOf[PolygonFeature], serializer, kryo.getNextRegistrationId)
-    kryo.register(classOf[LineStringFeature], serializer, kryo.getNextRegistrationId)
-    kryo.register(classOf[CircleFeature], serializer, kryo.getNextRegistrationId)
-    kryo.register(classOf[RectangleFeature], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[GeometryFeature[_]], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[SimpleFeatureImpl], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[PointFeature], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[PolygonFeature], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[LineStringFeature], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[CircleFeature], serializer, kryo.getNextRegistrationId)
+//    kryo.register(classOf[RectangleFeature], serializer, kryo.getNextRegistrationId)
 
   }
 }

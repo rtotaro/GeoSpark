@@ -29,10 +29,7 @@ import org.datasyslab.geospark.formatMapper.shapefileParser.parseUtils.shp.TypeU
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.PrimitiveShape;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeInputFormat;
 import org.datasyslab.geospark.formatMapper.shapefileParser.shapes.ShapeKey;
-import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.LineStringFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
-import org.datasyslab.geospark.simpleFeatureObjects.PolygonFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.*;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.*;
@@ -145,34 +142,17 @@ public class ShapefileRDD
      */
     public JavaRDD<PointFeature> getPointRDD()
     {
-        return shapeRDD.flatMap(new FlatMapFunction<Geometry, Point>()
-        {
+        return shapeRDD.flatMap(new FlatMapFunction<Geometry,PointFeature>() {
             @Override
-            public Iterator<Point> call(Geometry spatialObject)
-                    throws Exception
+            public Iterator<PointFeature> call(Geometry spatialObject) throws Exception
             {
-                List<Point> result = new ArrayList<Point>();
-                if (spatialObject instanceof MultiPoint) {
-                    MultiPoint multiObjects = (MultiPoint) spatialObject;
-                    for (int i = 0; i < multiObjects.getNumGeometries(); i++) {
-                        Point oneObject = (Point) multiObjects.getGeometryN(i);
-                        oneObject.setUserData(multiObjects.getUserData());
-                        result.add(oneObject);
-                    }
-                }
-                else if (spatialObject instanceof Point) {
-                    result.add((Point) spatialObject);
-                }
-                else {
-                    throw new Exception("[ShapefileRDD][getPointRDD] the object type is not Point or MultiPoint type. It is " + spatialObject.getGeometryType());
-                }
-                return result.iterator();
+                return (Iterator<PointFeature>)GeometryFeatureFactory.createGeometryFeatures(spatialObject,Point.class).iterator();
             }
-        }).map(v1 -> PointFeature.createFeature(createSimpleFeature(v1)));
+        });
     }
 
     private SimpleFeature createSimpleFeature(Geometry geometry) {
-        SimpleFeature simpleFeature = SimpleFeatureBuilder.build(GeometryFeature.geometryFeatureType, Arrays.asList(geometry.toText(),geometry), UUID.randomUUID().toString());
+        SimpleFeature simpleFeature = GeometryFeatureFactory.createGeometryFeature(geometry);
         return simpleFeature;
     }
 

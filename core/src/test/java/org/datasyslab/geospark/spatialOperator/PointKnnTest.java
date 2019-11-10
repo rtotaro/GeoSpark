@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeature;
+import org.datasyslab.geospark.simpleFeatureObjects.GeometryFeatureFactory;
 import org.datasyslab.geospark.simpleFeatureObjects.PointFeature;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -158,7 +159,7 @@ public class PointKnnTest
                 }
             }
         }
-        queryPoint = (PointFeature) GeometryFeature.createGeometryFeature(fact.createPoint(new Coordinate(-84.01, 34.01)));
+        queryPoint = (PointFeature) GeometryFeatureFactory.createGeometryFeature(fact.createPoint(new Coordinate(-84.01, 34.01)));
         topK = 100;
     }
 
